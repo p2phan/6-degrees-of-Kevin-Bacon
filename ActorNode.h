@@ -1,8 +1,8 @@
 #ifndef ACTORNODE_H
 #define ACTORNODE_H
-
+#include "ActorEdge.h"
 #include <unordered_set>
-
+#include <limits>
 /* CSE 100 PA 4 */
 /* Authors: Peter Phan
  *          Dephanie Ho */
@@ -10,28 +10,24 @@
  * corresponding edges that connect the actors and the movies */
 
 
-using namespace std:
+using namespace std;
 
 class ActorNode {
-
-public:
-    ActorNode(string actor): name(actor) {}
-    bool searched;
-    int dist;
-    ActorNode* prev;
-    string getName();
-    unordered_set edges;
-
-
 private:
     string name;
 
 
+public:
+    string getName();
+    unordered_set<ActorEdge*> edges;
 
+    bool searched;
+    int dist;
+    ActorNode* prev;
 
-
-
-
+    ActorNode(string actor): name(actor), searched(0), prev(0),
+                             dist(std::numeric_limits<int>::max()) {}
+ 
 
 
 };

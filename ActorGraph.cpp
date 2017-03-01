@@ -58,7 +58,26 @@ bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) 
         string movie_title(record[1]);
         int movie_year = stoi(record[2]);
     
+        ActorNode* actor = actors.at(actor_name);
+        if(!actor)
+        {
+            
+            actor = new ActorNode(actor_name);
+ 	    actors.insert(pair<actor_name, actor>);
+        }
+        
+       
+      
         // we have an actor/movie relationship, now what?
+        Movie::Movie* movie = new Movie(movie_title, movie_year); 
+        ActorEdge::ActorEdge* edge = new ActorEdge(movie, actor);
+	
+	
+	//insert edge(that contain movie information) into actor->edge
+	actor->edges.insert(edge);
+	//insert actor into actorGraph
+	
+        
     }
 
     if (!infile.eof()) {

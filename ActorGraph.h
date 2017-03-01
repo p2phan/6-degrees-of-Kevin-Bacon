@@ -1,7 +1,8 @@
 /*
  * ActorGraph.h
- * Author: <Peter Phan, Dephanie Ho>
- * Date:   <02/28/2017>
+ * Author: Peter Phan, 
+ *         Dephanie Ho
+ * Date:   02/28/2017
  *
  * This file is meant to exist as a container for starter code that you can use to read the input file format
  * defined in movie_casts.tsv. Feel free to modify any/all aspects as you wish.
@@ -13,7 +14,7 @@
 #include "ActorEdge.h"
 #include "Movie.h"
 #include <iostream>
-
+#include <unordered_map>
 // Maybe include some data structures here
 
 using namespace std;
@@ -21,6 +22,7 @@ using namespace std;
 class ActorGraph {
 protected:
   
+    unordered_map<string, ActorNode*> actors;
     // Maybe add class data structure(s) here
 
 public:

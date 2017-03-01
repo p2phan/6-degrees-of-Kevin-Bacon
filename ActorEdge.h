@@ -2,7 +2,7 @@
 #define ACTOREDGE_H
 
 #include "ActorNode.h"
-#include "ActorMovie.h"
+#include "Movie.h"
 
 /* CSE 100 PA4 */
 /* Authors: Peter Phan
@@ -11,20 +11,20 @@
 
 
 class ActorEdge {
-public:
-    bool searched;
-
-    ActorMovie* getMovie();
-
-    ActorNode* getActorNode();
-   
-
 private:
-    ActorMovie* movie;
+    Movie* movie;
     ActorNode* actor;
 
 
+public:
+    bool searched;
 
+    Movie* getMovie();
+
+    ActorNode* getActorNode();
+   
+    ActorEdge(Movie* movie_edge, ActorNode* actor_node):
+                                 movie(movie_edge), actor(actor_node) {}
 
 };
 
