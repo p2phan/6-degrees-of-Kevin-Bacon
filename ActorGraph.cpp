@@ -1,7 +1,8 @@
 /*
  * ActorGraph.cpp
- * Author: <YOUR NAME HERE>
- * Date:   <DATE HERE>
+ * Author: Peter Phan
+ *         Dephanie Ho
+ * Date:   02/28/2017
  *
  * This file is meant to exist as a container for starter code that you can use to read the input file format
  * defined in movie_casts.tsv. Feel free to modify any/all aspects as you wish.
@@ -17,6 +18,59 @@
 using namespace std;
 
 ActorGraph::ActorGraph(void) {}
+
+ActorNode* ActorGraph::BFSTraverse(string actorFrom, string actorTo)
+{
+    ActorNode* start = actors.at(actorFrom);
+    ActorNode* end = actors.at(actorTo);
+
+    if(!start || !end){
+        return 0;
+    }
+
+    for( auto it = actors.begin(); it != actors.end(); ++it)
+    {
+        it->second->v.searched = false;
+        it->second->v.dist = std::numeric_limits<int>::max();
+        it->second->v.prev = 0;
+    }
+    
+    queue<ActorNode*> toExplore;
+    start->v.dist = 0;
+    toExplore.push(start);
+
+    while(!toExplore.empty())
+    {
+        ActorNode* next = toExplore.front();
+        toExplore.pop();
+        
+        auto it = next->movieString.begin();
+        for( ; it!= next->movieString.end(); it++)
+        {
+            string movie_title = *it;
+            Movie* movie = movies.at(movie_title);
+            auto neighbors = movie->actorName.begin();
+
+
+
+
+            ActorNode* neighbor = (*it)->getActorNode();
+            if(next->v.dist+1 < neighbor->v.dist){
+                neighbor->v.dist = next->v.dist+1;
+                neighbor->v.prev = next;
+                toExplore.push(neighbor);
+            }
+        }
+    }
+    
+    return end;
+}
+
+void printPath(ActorNode* path, ofstream print)
+{
+   // for
+
+}
 
 bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) {
     // Initialize the file stream
@@ -61,21 +115,25 @@ bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) 
         ActorNode* actor = actors.at(actor_name);
         if(!actor)
         {
-            
+            //insert actor into the graph    
             actor = new ActorNode(actor_name);
- 	    actors.insert(pair<actor_name, actor>);
+ 	    actors.insert(pair<string, ActorNode*>(actor_name, actor));
         }
         
        
       
         // we have an actor/movie relationship, now what?
-        Movie* movie = new Movie(movie_title, movie_year); 
-        ActorEdge* edge = new ActorEdge(movie, actor);
-	
+        movie_title_year = movie_title + "#@" + record[2];
+        Movie* movie = movies.at(movie_title_year);
+        if(!movie)
+        {
+            movie = new Movie(movie_title, movie_year); 
+            movie.insert(pair<string, Movie*>(movie_title_year, movie));
+        // ActorEdge* edge = new ActorEdge(movie, actor);
+	}
 	
 	//insert edge(that contain movie information) into actor->edge
-	actor->edges.insert(edge);
-	//insert actor into actorGraph
+	//actor->edges.insert(edge);
 	
         
     }

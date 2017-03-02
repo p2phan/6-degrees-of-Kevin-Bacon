@@ -15,13 +15,14 @@
 #include "Movie.h"
 #include <iostream>
 #include <unordered_map>
+#include <queue>
 // Maybe include some data structures here
 
 using namespace std;
 
 class ActorGraph {
 protected:
-  
+    unordered_map<string, Movie*> movies; 
     unordered_map<string, ActorNode*> actors;
     // Maybe add class data structure(s) here
 
@@ -29,6 +30,15 @@ public:
     ActorGraph(void);
 
     // Maybe add some more methods here
+    /*
+     *  Traverse the graph using BFS
+     */
+    ActorNode* BFSTraverse(string actorFrom, string actorTo);
+
+    /** Prints out the shortest path of the two actors
+     *
+     */
+    void printPath(ActorNode* path, ofstream print);
   
     /** You can modify this method definition as you wish
      *
@@ -42,7 +52,7 @@ public:
     bool loadFromFile(const char* in_filename, bool use_weighted_edges);
   
     //method to print out shortest path
-    //finish loadfrom Fiel
+    //finish loadfrom File
     //add in ActorNode/ActorEdge andddd Movie objects
     //
 };

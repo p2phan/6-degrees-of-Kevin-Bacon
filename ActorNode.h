@@ -18,17 +18,25 @@ private:
 
 
 public:
+    struct Vertex{
+        bool searched;
+        int dist;
+        ActorNode* prev;
+    };
+
+    Vertex v;
+
     string getName();
-    unordered_set<ActorEdge*> edges;
+    unordered_set<string> movieString;
 
-    bool searched;
-    int dist;
-    ActorNode* prev;
+   //bool searched;
+    //int dist;
+    //ActorNode* prev;
 
-    ActorNode(string actor): name(actor), searched(0), prev(0),
-                             dist(std::numeric_limits<int>::max()) {}
+    //ActorNode(string actor): name(actor), searched(0), prev(0),
+                             //dist(std::numeric_limits<int>::max()) {}
  
-
+    ActorNode(string actor): name(actor) {}
 
 };
 

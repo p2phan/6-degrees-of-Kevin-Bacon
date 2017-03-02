@@ -20,8 +20,9 @@ private:
 
 
 public:
+    
     string getMovie();
-    unordered_set<ActorNode*> actors;
+    unordered_set<string> actorName;
 
     Movie(string movie, int movieYear): title(movie), year(movieYear) {}
 
