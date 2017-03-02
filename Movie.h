@@ -8,11 +8,15 @@
  *          Dephanie Ho */
 /* Movie.h - Class that contains movie name and list of actors in the movie */
 
+class ActorNode;
+class ActorEdge;
+
 using namespace std;
 class Movie {
 private:
     string title;
-    int year; 
+    int year;
+    string movie; 
 
 
 public:

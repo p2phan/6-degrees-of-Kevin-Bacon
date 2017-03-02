@@ -69,8 +69,8 @@ bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) 
        
       
         // we have an actor/movie relationship, now what?
-        Movie::Movie* movie = new Movie(movie_title, movie_year); 
-        ActorEdge::ActorEdge* edge = new ActorEdge(movie, actor);
+        Movie* movie = new Movie(movie_title, movie_year); 
+        ActorEdge* edge = new ActorEdge(movie, actor);
 	
 	
 	//insert edge(that contain movie information) into actor->edge

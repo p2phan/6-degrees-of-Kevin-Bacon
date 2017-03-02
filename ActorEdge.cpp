@@ -7,7 +7,7 @@
 
 /** Getter method to acces the Movie class stored
  */
-ActorMovie* ActorEdge::getMovie()
+Movie* ActorEdge::getMovie()
 {
     return movie;
 }

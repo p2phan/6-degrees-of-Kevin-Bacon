@@ -8,7 +8,7 @@
  *          Dephanie Ho */
 /* ActorNode.h - Node class that stores actor name, previous name, and 
  * corresponding edges that connect the actors and the movies */
-
+class ActorEdge;
 
 using namespace std;
 

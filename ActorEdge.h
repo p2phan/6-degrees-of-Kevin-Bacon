@@ -9,6 +9,8 @@
  *          Dephanie Ho */
 /* ActorEdge.h - Class that points to one actor to another through a movie */
 
+class ActorNode;
+class Movie;
 
 class ActorEdge {
 private:
