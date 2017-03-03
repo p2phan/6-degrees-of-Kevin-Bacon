@@ -24,3 +24,6 @@
 
 # TSV files
 *.tsv
+
+# PA4 files
+pa4/*
