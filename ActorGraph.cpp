@@ -110,7 +110,7 @@ void ActorGraph::printPath(ActorNode* path, ofstream& out)
 
     }
     
-    out << endl;
+    out << "\n";
 }
 
 bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) {

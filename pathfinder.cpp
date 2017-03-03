@@ -53,8 +53,7 @@ int main(int argc, char** argv){
 
     //Reading pairactor file and printing paths
     ofstream outfile(argv[4]);
-    outfile << "(actor)--[movie#@year]-->(actor)--..."
-            << endl;
+    outfile << "(actor)--[movie#@year]-->(actor)--...\n";
 
     cout << "header" << endl;
 
