@@ -21,13 +21,14 @@ public:
     struct Vertex{
         bool searched;
         int dist;
-        ActorNode* prev;
+        ActorNode* prevA;
+        string prevM;
     };
 
     Vertex v;
 
     string getName();
-    unordered_set<string> movieString;
+    unordered_set<string> movie_history;
 
    //bool searched;
     //int dist;

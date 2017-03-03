@@ -1,6 +1,7 @@
 #include "ActorGraph.h"
 
 #include <iostream>
+#include <sstream>
 #include <fstream>
 
 using namespace std;
@@ -21,45 +22,57 @@ int main(int argc, char** argv){
         return -1;
     }
     
-   
+    cout << "making graph"<< endl;
+    
     ActorGraph graph;
     //Makes the graph
     bool weighted;
-    if(argv[2] == "u")
+    /*if(argv[2] == "u")
     {
+        cout <<"unweighted" << endl;
         graph.loadFromFile(argv[1], false);
     }
     
     if(argv[2] == "w")
     {
         graph.loadFromFile(argv[1], true);
-    }
+    }*/
+        graph.loadFromFile(argv[1], false);
+    
 
-    ifstream in;
-    in.open(argv[3]);
+    ifstream infile;
+    infile.open(argv[3]);
 
-    if(!in.is_open())
+    if(!infile.is_open())
     {
         cout << "Third file cannot be opened" << endl;
         return -1;
     }
 
+    cout << "finding shortest distances between pairs" << endl;
+
     //Reading pairactor file and printing paths
     ofstream outfile(argv[4]);
+    outfile << "(actor)--[movie#@year]-->(actor)--..."
+            << endl;
+
+    cout << "header" << endl;
+
     bool have_header = false;
 
-    while (in)
+    while (infile)
     {
         string s;
 
         if(!getline( infile, s )) break;
         
         if (!have_header) {
-            skip the header
+           //skip the header
             have_header = true;
             continue;
         }
 
+        cout << "before header" <<endl;
         istringstream ss( s );
         vector <string> record;
         //get actors that are delimited by tab
@@ -79,16 +92,29 @@ int main(int argc, char** argv){
         string actor1(record[0]);
         string actor2(record[1]);
         
+        cout << "before bfs" << endl;
+        cout << actor1 << " is with " << actor2 << endl;
         //Find shortest path between actor 1 and actor 2
         ActorNode* endNode = graph.BFSTraverse(actor1, actor2);
 
+        cout << "before print" << endl; 
+        if(endNode)
+        {
+            graph.printPath(endNode, outfile);
+        }
+        else 
+        {
+            outfile << "No Path" << endl;
+        }
         
-        graph.printPath(endNode, out_file
-
 
     }
     //do bfs
     //print out
-    
+    infile.close();
+    outfile.close();   
+
+    cout << "done " <<endl;
+
 
 }

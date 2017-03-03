@@ -13,6 +13,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <stack>
+
 #include "ActorGraph.h"
 
 using namespace std;
@@ -21,55 +23,94 @@ ActorGraph::ActorGraph(void) {}
 
 ActorNode* ActorGraph::BFSTraverse(string actorFrom, string actorTo)
 {
-    ActorNode* start = actors.at(actorFrom);
-    ActorNode* end = actors.at(actorTo);
-
-    if(!start || !end){
+    cout << "before vector intilization"<< endl;
+    if(actors.find(actorFrom) == actors.end() || 
+       actors.find(actorTo) == actors.end()){
         return 0;
     }
+
+    ActorNode* start = actors[actorFrom];
+    ActorNode* end = actors[actorTo];
 
     for( auto it = actors.begin(); it != actors.end(); ++it)
     {
         it->second->v.searched = false;
         it->second->v.dist = std::numeric_limits<int>::max();
-        it->second->v.prev = 0;
+        it->second->v.prevA = 0;
+        it->second->v.prevM = "";
     }
     
     queue<ActorNode*> toExplore;
     start->v.dist = 0;
     toExplore.push(start);
 
+   cout << "before while" << endl;
     while(!toExplore.empty())
     {
         ActorNode* next = toExplore.front();
         toExplore.pop();
-        
-        auto it = next->movieString.begin();
-        for( ; it!= next->movieString.end(); it++)
+     
+        cout << "popping" <<endl;   
+        auto it = next->movie_history.begin();
+        for( ; it!= next->movie_history.end(); it++)
         {
+            cout << "meighbor" << endl;
             string movie_title = *it;
             Movie* movie = movies.at(movie_title);
-            auto neighbors = movie->actorName.begin();
+            auto it2 = movie->cast.begin();
+            for( ; it2 != movie->cast.end(); it2++)
+            {
+                cout << "actor in movie" << endl;
+                ActorNode* neighbor = actors.at(*it2);
+ 
+                if(next->v.searched){ continue;}           
+ 
+                if(next->v.dist+1 < neighbor->v.dist){
+                    neighbor->v.searched = true;
+                    neighbor->v.dist = next->v.dist+1;
+                    neighbor->v.prevA = next;
+                    neighbor->v.prevM = movie_title;
+                    toExplore.push(neighbor);
+                }
 
-
-
-
-            ActorNode* neighbor = (*it)->getActorNode();
-            if(next->v.dist+1 < neighbor->v.dist){
-                neighbor->v.dist = next->v.dist+1;
-                neighbor->v.prev = next;
-                toExplore.push(neighbor);
+                if(neighbor == end){ return end;}
+                
             }
+
+
+            //:86
+            //ActorNode* neighbor = (*it)->getActorNode();
+            
         }
     }
     
-    return end;
+    // If it reaches the end, that means that there is no path between
+    // the actors
+    return nullptr;
 }
 
-void printPath(ActorNode* path, ofstream print)
+void ActorGraph::printPath(ActorNode* path, ofstream& out)
 {
-   // for
+    ActorNode* curr = path;
+    stack<pair<string, ActorNode*>> store;
 
+    while(curr->v.prevA)
+    {
+        store.push(pair<string, ActorNode*>(curr->v.prevM, curr));
+        curr = curr->v.prevA;
+    }
+
+    out << "(" << curr->getName() << ")";
+    while(!store.empty())
+    {
+        auto print = store.top();
+        store.pop();
+        out << "--[" << print.first << "]-->("
+            << print.second->getName() << ")";
+
+    }
+    
+    out << endl;
 }
 
 bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) {
@@ -78,6 +119,7 @@ bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) 
 
     bool have_header = false;
   
+    cout << "before while"<< endl;
     // keep reading lines until the end of file is reached
     while (infile) {
         string s;
@@ -108,33 +150,39 @@ bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) 
             continue;
         }
 
+
         string actor_name(record[0]);
         string movie_title(record[1]);
         int movie_year = stoi(record[2]);
     
-        ActorNode* actor = actors.at(actor_name);
-        if(!actor)
+        cout << "got strings"<< endl;
+        if(actors.find(actor_name) == actors.end())
         {
             //insert actor into the graph    
-            actor = new ActorNode(actor_name);
- 	    actors.insert(pair<string, ActorNode*>(actor_name, actor));
+ 	    actors.insert(pair<string, ActorNode*>(actor_name, 
+                                     new ActorNode(actor_name)));
         }
         
-       
+        ActorNode* actor = actors.at(actor_name);
+        cout << "actor" << endl; 
+        cout << actors.at(actor_name)->getName() << endl;
       
         // we have an actor/movie relationship, now what?
-        movie_title_year = movie_title + "#@" + record[2];
-        Movie* movie = movies.at(movie_title_year);
-        if(!movie)
+        string movie_title_year = movie_title + "#@" + record[2];
+        if(movies.find(movie_title_year) == movies.end())
         {
-            movie = new Movie(movie_title, movie_year); 
-            movie.insert(pair<string, Movie*>(movie_title_year, movie));
+         
+            movies.insert(pair<string, Movie*>(movie_title_year,
+                                     new Movie(movie_title, movie_year)));
         // ActorEdge* edge = new ActorEdge(movie, actor);
 	}
+
+        Movie* movie = movies.at(movie_title_year);
 	
 	//insert edge(that contain movie information) into actor->edge
 	//actor->edges.insert(edge);
-	
+        actor->movie_history.insert(movie_title_year);
+        movie->cast.insert(actor_name);
         
     }
 

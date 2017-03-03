@@ -22,7 +22,7 @@ private:
 public:
     
     string getMovie();
-    unordered_set<string> actorName;
+    unordered_set<string> cast;
 
     Movie(string movie, int movieYear): title(movie), year(movieYear) {}
 

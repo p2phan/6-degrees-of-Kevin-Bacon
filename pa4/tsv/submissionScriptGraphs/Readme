@@ -1,0 +1,113 @@
+CHECKPOINT SUBMISSION SCRIPTS
+******************************
+
+Please note that for the checkpoint submission scripts we test you with only simple small graphs. It is your responsibility to ensure and test your code more extensively with medium sized and big graphs. 
+To help you with your submission, here are the details on the submission script.
+There are 3 test files (in the format of movie_casts.tsv) used for basic checking in the submission script. The names and movies in the tests are not shown below as we hope you can replicate these scenarios locally to test your code if you run into problems.
+ 
+"2-node_simple" is a graph with two actors who are in the same movie.
+Actor1 ----- Actor2
+
+This graph is tested with one test pair using (Actor1, Actor2).
+
+"3-node_simple" is a graph where two actors are only in one movie and the third actor is in both of the movies the other actors are in.
+Actor1 ----- Actor3 ----- Actor2
+
+This graph is tested with one test pair using (Actor1, Actor2).
+"3-node_3-movie" is a graph with three actors and three movies where each actor is in a single movie with both of the other actors.
+ 
+Actor1 ----- Actor2
+     \                /
+      \              /
+       \            /
+        \          /
+         \        /
+          \      /
+         Actor3
+This graph is tested with two test pairs using (Actor1, Actor2) and (Actor1, Actor3).
+ 
+ 
+Also, 
+If you get an exit status of 124, it means that your code timed out.
+If you get an exit status of 139, it means your code segfaulted
+If you get an exit status of 137, it means Vocareum killed your program, but we should kill it well before Vocareum does 
+
+
+
+FINAL SUBMISSION SCRIPTS
+*************************
+
+PA4's final submission scripts should be  up on Vocareum. Here is some information about what is being tested to help you debug and make sense of errors that you get.
+ 
+At a minimum you need to be able to compile using "make pathfinder" and "make actorconnections". If one of them can't compile the script will let you know and exit. It will also check "make extension" and will inform you if it does not compile. It also checks for extension.txt and Report.pdf, and will only tell you if they are missing,
+ 
+There are 6 files (movie_casts.tsv format) used to test your code in the submission script.These 6 files are tested using pathfinder's u and w flags as well as actorconnections' bfs and ufind flags meaning there are 24 individual tests run
+Output files from pathfinder are checked using a pathverifier program that reads in the paths and does a graph traversal checking to see if the path given is valid and also if it is actually the shortest path
+Output files from actorconnections are checked by diffing your output with the reference output since there is only 1 right answer for each pair for actorconnections
+ 
+Here are the descriptions for the tests files:
+ 
+"2-node_simple" is a graph with two actors who are in the same movie.
+ 
+Actor1 ----- Actor2
+ 
+This graph is tested with one test pair using (Actor1, Actor2).
+ 
+ 
+"3-node_simple" is a graph where two actors are only in one movie and the third actor is in both of the movies the other actors are in.
+ 
+Actor1 ----- Actor3 ----- Actor2
+ 
+This graph is tested with one test pair using (Actor1, Actor2).
+ 
+ 
+"3-node_3-movie" is a graph with three actors and three movies where each actor is in a single movie with both of the other actors.
+ 
+Actor1 ----- Actor2
+     \                /
+      \              /
+       \            /
+        \          /
+         \        /
+          \      /
+         Actor3
+ 
+This graph is tested with two test pairs using (Actor1, Actor2) and (Actor1, Actor3).
+ 
+ 
+"3-node_3-movie2" is a graph with three actors and three movies where each actor is in a single movie with both of the other actors. The difference between this and "3-node_3-movie" is the years in which the movies are made which makes it so that there can be 2 answers for the weighted path and the actorconnections output will be different because the change to each of the movies having different years in which they were made.
+ 
+Actor1 ----- Actor2
+     \                /
+      \              /
+       \            /
+        \          /
+         \        /
+          \      /
+         Actor3
+ 
+This graph is tested with 2 test pairs using (Actor1, Actor2) and (Actor1, Actor3).
+ 
+ 
+"medium_weighted_graph" is a little more complicated than I want to write out in ascii art. I'll make a few points about details I feel are important or statistics that I think could be useful.
+There are 8 actors total one of which is "BACON, KEVIN (I)"
+There are 11 unique movies (movie name and year)
+Many of the movies either have the same name and different year as other movies or vice versa
+Every actor is in at least 2 movies except for "BACON, KEVIN (I)"
+Every movie only has 2 actors in it except for the one with "BACON, KEVIN (I)" which has 3
+There are multiple edges between some actors (both is same movies)
+This file is like a step towards the complexity of movie_casts.tsv but on a very small scale
+ 
+This graph is tested with 2 test pairs. 
+ 
+ 
+"movie_casts_grading" is like the movie_casts.tsv file we provide to you, but it is about 1/3 of the size. You should probably only care about this passing if all of your other tests are passing as well since it will be hard to debug this one. The goal is that you implemented your code general enough that passing the other tests also causes you to pass this one.
+ 
+This file is tested with 30 pairs.
+
+ 
+Also, 
+If you get an exit status of 124, it means that your code timed out.
+If you get an exit status of 139, it means your code segfaulted
+If you get an exit status of 137, it means Vocareum killed your program, but we should kill it well before Vocareum does 
+ 

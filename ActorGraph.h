@@ -38,7 +38,7 @@ public:
     /** Prints out the shortest path of the two actors
      *
      */
-    void printPath(ActorNode* path, ofstream print);
+    void printPath(ActorNode* path, ofstream& print);
   
     /** You can modify this method definition as you wish
      *
