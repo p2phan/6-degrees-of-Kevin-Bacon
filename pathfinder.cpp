@@ -22,7 +22,7 @@ int main(int argc, char** argv){
         return -1;
     }
     
-    cout << "making graph"<< endl;
+    //cout << "making graph"<< endl;
     
     ActorGraph graph;
     //Makes the graph
@@ -49,13 +49,13 @@ int main(int argc, char** argv){
         return -1;
     }
 
-    cout << "finding shortest distances between pairs" << endl;
+   // cout << "finding shortest distances between pairs" << endl;
 
     //Reading pairactor file and printing paths
     ofstream outfile(argv[4]);
     outfile << "(actor)--[movie#@year]-->(actor)--...\n";
 
-    cout << "header" << endl;
+    //cout << "header" << endl;
 
     bool have_header = false;
 
@@ -71,7 +71,7 @@ int main(int argc, char** argv){
             continue;
         }
 
-        cout << "before header" <<endl;
+        //cout << "before header" <<endl;
         istringstream ss( s );
         vector <string> record;
         //get actors that are delimited by tab
@@ -91,12 +91,12 @@ int main(int argc, char** argv){
         string actor1(record[0]);
         string actor2(record[1]);
         
-        cout << "before bfs" << endl;
-        cout << actor1 << " is with " << actor2 << endl;
+       // cout << "before bfs" << endl;
+       // cout << actor1 << " is with " << actor2 << endl;
         //Find shortest path between actor 1 and actor 2
         ActorNode* endNode = graph.BFSTraverse(actor1, actor2);
 
-        cout << "before print" << endl; 
+     //   cout << "before print" << endl; 
         if(endNode)
         {
             graph.printPath(endNode, outfile);
@@ -113,7 +113,7 @@ int main(int argc, char** argv){
     infile.close();
     outfile.close();   
 
-    cout << "done " <<endl;
+   // cout << "done " <<endl;
 
 
 }

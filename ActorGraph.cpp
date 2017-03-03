@@ -23,7 +23,7 @@ ActorGraph::ActorGraph(void) {}
 
 ActorNode* ActorGraph::BFSTraverse(string actorFrom, string actorTo)
 {
-    cout << "before vector intilization"<< endl;
+ //   cout << "before vector intilization"<< endl;
     if(actors.find(actorFrom) == actors.end() || 
        actors.find(actorTo) == actors.end()){
         return 0;
@@ -44,27 +44,30 @@ ActorNode* ActorGraph::BFSTraverse(string actorFrom, string actorTo)
     start->v.dist = 0;
     toExplore.push(start);
 
-   cout << "before while" << endl;
+ //  cout << "before while" << endl;
     while(!toExplore.empty())
     {
         ActorNode* next = toExplore.front();
         toExplore.pop();
      
-        cout << "popping" <<endl;   
+   //     cout << "popping " << next->getName() << endl;   
         auto it = next->movie_history.begin();
         for( ; it!= next->movie_history.end(); it++)
         {
-            cout << "meighbor" << endl;
+     //       cout << *it << " connects..." <<endl;
             string movie_title = *it;
             Movie* movie = movies.at(movie_title);
             auto it2 = movie->cast.begin();
             for( ; it2 != movie->cast.end(); it2++)
             {
-                cout << "actor in movie" << endl;
+       //         cout << *it2 << " actor in movie" << endl;
                 ActorNode* neighbor = actors.at(*it2);
  
-                if(next->v.searched){ continue;}           
- 
+//cout << neighbor->v.searched << " is bool" << endl;
+//cout << neighbor->v.dist << " is dist" << endl;
+                if(neighbor->v.searched){ continue;}           
+                
+//cout << neighbor->v.prevM<< " is movie" << endl;
                 if(next->v.dist+1 < neighbor->v.dist){
                     neighbor->v.searched = true;
                     neighbor->v.dist = next->v.dist+1;
@@ -119,7 +122,7 @@ bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) 
 
     bool have_header = false;
   
-    cout << "before while"<< endl;
+//    cout << "before while"<< endl;
     // keep reading lines until the end of file is reached
     while (infile) {
         string s;
@@ -155,7 +158,7 @@ bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) 
         string movie_title(record[1]);
         int movie_year = stoi(record[2]);
     
-        cout << "got strings"<< endl;
+  //      cout << "got strings"<< endl;
         if(actors.find(actor_name) == actors.end())
         {
             //insert actor into the graph    
@@ -164,8 +167,8 @@ bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) 
         }
         
         ActorNode* actor = actors.at(actor_name);
-        cout << "actor" << endl; 
-        cout << actors.at(actor_name)->getName() << endl;
+    //    cout << "actor" << endl; 
+    //    cout << actors.at(actor_name)->getName() << endl;
       
         // we have an actor/movie relationship, now what?
         string movie_title_year = movie_title + "#@" + record[2];
