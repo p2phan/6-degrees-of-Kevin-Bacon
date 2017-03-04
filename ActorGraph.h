@@ -10,24 +10,38 @@
 
 #ifndef ACTORGRAPH_H
 #define ACTORGRAPH_H
+
 #include "ActorNode.h"
 #include "ActorEdge.h"
 #include "Movie.h"
+
 #include <iostream>
 #include <unordered_map>
 #include <queue>
+
 // Maybe include some data structures here
 
 using namespace std;
-
+/*
+ * ActorGraph - a class that is a representative of a graph where
+ * actors are nodes, movies are edges, and movie's year is the weight
+ */
 class ActorGraph {
 protected:
-    unordered_map<string, Movie*> movies; 
-    unordered_map<string, ActorNode*> actors;
+    unordered_map<string, Movie*> movies; //Maps movie name to Movie class 
+    unordered_map<string, ActorNode*> actors; //Maps actor name to ActorNode
     // Maybe add class data structure(s) here
 
 public:
+    /* 
+     * Constructor
+     */
     ActorGraph(void);
+     
+    /*
+     * Destructor
+     */
+    ~ActorGraph();
 
     // Maybe add some more methods here
     /*
@@ -50,11 +64,12 @@ public:
      * return true if file was loaded sucessfully, false otherwise
      */
     bool loadFromFile(const char* in_filename, bool use_weighted_edges);
-  
-    //method to print out shortest path
-    //finish loadfrom File
-    //add in ActorNode/ActorEdge andddd Movie objects
-    //
+    
+private:
+    /*
+     * Helper method for destructor
+     */
+    void deleteAll();  
 };
 
 
