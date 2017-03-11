@@ -26,19 +26,8 @@ int main(int argc, char** argv){
     
     ActorGraph graph;
     //Makes the graph
-    bool weighted;
-    /*if(argv[2] == "u")
-    {
-        cout <<"unweighted" << endl;
-        graph.loadFromFile(argv[1], false);
-    }
     
-    if(argv[2] == "w")
-    {
-        graph.loadFromFile(argv[1], true);
-    }*/
-        graph.loadFromFile(argv[1], false);
-    
+    graph.loadFromFile(argv[1], true);
 
     ifstream infile;
     infile.open(argv[3]);
@@ -87,14 +76,33 @@ int main(int argc, char** argv){
         if (record.size() != 2) {
              continue;
         }
+
         //Get pair of actors 
         string actor1(record[0]);
         string actor2(record[1]);
         
+        cout << "Calculating path for " << actor1 
+             << " and " << actor2 << endl;
        // cout << "before bfs" << endl;
        // cout << actor1 << " is with " << actor2 << endl;
         //Find shortest path between actor 1 and actor 2
-        ActorNode* endNode = graph.BFSTraverse(actor1, actor2);
+        ActorNode* endNode;
+        if(string(argv[2]) == "u")
+        {
+            endNode = graph.BFSTraverse(actor1, actor2);
+        }
+         else if(string(argv[2]) == "w")
+        {
+            endNode = graph.DijkstraTraverse(actor1, actor2);
+        }
+        else
+        {
+            cout << "Invalid 2nd arg. Please input a 'u' or 'w'";
+            infile.close();
+            outfile.close();
+            return -1;
+        } 
+
 
      //   cout << "before print" << endl; 
         if(endNode)

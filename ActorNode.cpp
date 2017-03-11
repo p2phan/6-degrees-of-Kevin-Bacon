@@ -18,3 +18,21 @@ string ActorNode::getName()
     return name;
 }
 
+/** Less-than comparison, so ActorNodes will work in std::priority_queue
+ *  We want small counts to have high priority. 
+ *  And we want to break ties deterministically.
+ *
+ *  Parameter:
+ *         other: the ActorNode we are comparing current ActorNode to
+ */
+bool ActorNode::operator<(const ActorNode& other)
+{
+    //Return the opposite because we want the lowest to be at the top
+    if(v.dist != other.v.dist)
+    {
+        return other.v.dist < v.dist;
+    }
+
+    return true; 
+
+}

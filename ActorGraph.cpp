@@ -21,6 +21,85 @@ using namespace std;
 
 ActorGraph::ActorGraph(void) {}
 
+
+/** Uses Dijkstra's algortihm to find the shortest weighted path 
+ * between 2 nodes
+ *
+ * Parameter: actorFrom: the node from which to start the search
+ *            actorTo: the end node of the searched path
+ */
+ActorNode* ActorGraph::DijkstraTraverse(string actorFrom, string actorTo)
+{
+    //Checks to see if node of actors exist
+    if(actors.find(actorFrom) == actors.end() ||
+       actors.find(actorTo) == actors.end()){
+        return 0;
+    }
+
+    ActorNode* start = actors[actorFrom];
+    ActorNode* end = actors[actorTo];
+ 
+    //Initializes every vertex in the actor node
+    for( auto it = actors.begin(); it != actors.end(); ++it)
+    {
+        it->second->v.searched = false;
+        it->second->v.dist = std::numeric_limits<int>::max();
+        it->second->v.prevA = 0;
+        it->second->v.prevM = "";
+    }
+
+    //Makes queue to store path    
+    priority_queue<ActorNode*, vector<ActorNode*>, ActorNodePtrComp> toExplore;
+    toExplore.push(start);
+    start->v.dist = 0;
+
+    while(!toExplore.empty())
+    {
+        ActorNode* next = toExplore.top();
+        toExplore.pop();
+
+
+        if(next->v.searched){ continue;}
+
+        
+        next->v.searched = true;
+            
+        auto it = next->movie_history.begin();
+        for( ; it!= next->movie_history.end(); it++)
+        {
+            string movie_title = *it;
+            Movie* movie = movies.at(movie_title);
+            auto it2 = movie->cast.begin();
+            for( ; it2 != movie->cast.end(); it2++)
+            {
+                ActorNode* neighbor = actors.at(*it2);
+                
+                int c = next->v.dist + movie->getWeight();
+
+                //update neighbor accordingly
+                if(c < neighbor->v.dist){
+                    neighbor->v.dist = c;
+                    neighbor->v.prevA = next;
+                    neighbor->v.prevM = movie_title;
+                    toExplore.push(neighbor);
+                }
+
+
+            }
+   
+
+        }         
+
+    }
+
+    if(!end->v.searched)
+    {
+        return 0;
+    }
+   
+    return end;
+}
+
 /** Does a BFS search to find the shortest path between two actors
  *
  *  Parameter: actorFrom - starting actor to search from
@@ -134,6 +213,54 @@ void ActorGraph::printPath(ActorNode* path, ofstream& out)
     out << "\n";
 }
 
+/** Returns the year after which two actors became connected
+ *  using a BFS
+ *  Paremter: actor1 - 1st actor to find year of connection
+ *            actor2 - 2nd actor to find year of connection
+ */
+int ActorGraph::AC_BFS(string actor1, string actor2)
+{
+    if(actors.find(actor1) == actors.end() ||
+       actors.find(actor2) == actors.end()){
+        return -1;
+    }
+
+    //ActorNode* start = actors[actorFrom];
+    //ActorNode* end = actors[actorTo];   
+
+    if(movies.empty()){ return -1; }
+
+    int year = std::numeric_limits<int>::max();
+    for(auto it = movies.begin(); it!= movies.end(); it++)
+    {
+         if((*it).second->getYear() < year )
+        {
+            year = (*it).second->getYear();
+        }       
+    }
+
+    while(year <= 2015)
+    {
+        for(auto it = movies.begin(); it!= movies.end(); it++)
+        {
+            Movie* movie = (*it).second;
+            if(movie->getYear() == year)
+            {
+                auto it2 = movie->cast.begin();
+                for( ; it2 != movie->cast.end(); it2++)
+                { 
+                    ActorNode* actor = actors.at(*it2);
+                    actor->movie_history.insert((*it).first);
+                }
+            }
+            
+        }
+        if(BFSTraverse(actor1, actor2)){ return year;}
+        year++;
+    }
+
+}
+
 /** Does a BFS search to find the shortest path between two actors
  *
  *  Parameter: actorFrom - starting actor to search from
@@ -205,12 +332,14 @@ bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) 
 	}
 
         Movie* movie = movies.at(movie_title_year);
+        movie->cast.insert(actor_name);
 	
 	//Insert edge(that contain movie information) into actor->edge
 	//actor->edges.insert(edge);
-        actor->movie_history.insert(movie_title_year);
-        movie->cast.insert(actor_name);
-        
+	if( use_weighted_edges)
+        {
+            actor->movie_history.insert(movie_title_year);
+        }
     }
 
     if (!infile.eof()) {
@@ -228,10 +357,10 @@ bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) 
 void ActorGraph::deleteAll()
 {
     for(auto it = movies.begin(); it != movies.end(); it++){
-        delete *it;
+        delete (*it).second;
     }
     for(auto it = actors.begin(); it != actors.end(); it++){
-        delete *it;
+        delete (*it).second;
     }
 }
 

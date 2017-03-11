@@ -42,6 +42,10 @@ public:
      */
     ActorNode(string actor): name(actor) {}
     
+    /*
+     *  Less-than comparison, so ActorNodes will work in std::priority_queue
+     */
+    bool operator<(const ActorNode& other);     
 };
 
 #endif //ACTORNODE_H

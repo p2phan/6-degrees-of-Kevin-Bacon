@@ -29,6 +29,17 @@ public:
      */
     string getMovie();
 
+
+    /*
+     * Getter to get the weight calculated as 1+(2015-year)
+     */
+    int getYear();
+
+    /*
+     * Getter to get the weight calculated as 1+(2015-year)
+     */ 
+    int getWeight();
+
     /*
      * Constructor
      */

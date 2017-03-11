@@ -22,6 +22,19 @@
 // Maybe include some data structures here
 
 using namespace std;
+
+/** A 'function class' for use as the Compare class in a
+ *  priority_queue<ActorNode*>.
+ *  We will make it so that lowest distance
+ *  has the highest priority
+ */
+class ActorNodePtrComp {
+public:
+    bool operator()(ActorNode*& lhs, ActorNode*& rhs) const {
+        return *lhs < *rhs;
+    }
+};
+
 /*
  * ActorGraph - a class that is a representative of a graph where
  * actors are nodes, movies are edges, and movie's year is the weight
@@ -43,7 +56,13 @@ public:
      */
     ~ActorGraph();
 
-    // Maybe add some more methods here
+
+    /** Uses Dijkstra's Alogrithm to find the shortest path
+     *  in a weighted graph
+     */ 
+
+    ActorNode* DijkstraTraverse(string actorFrom, string actorTo);
+
     /*
      *  Traverse the graph using BFS
      */
@@ -53,6 +72,20 @@ public:
      *
      */
     void printPath(ActorNode* path, ofstream& print);
+
+    /** Uses BFs to find the year after which two actors became connected
+     *  Parameters: actor1 - one of the actor node to find a path from
+     *              actor2 - another actor node to find a path from
+     *      
+     */ 
+    int AC_BFS(string actor1, string actor2);
+
+    /** Uses a disjoint set to find the year after which two actor
+     *  became connected
+     *  Parameters: actor1 - one of the actor node to find a path from
+     *              actor2 - another actor node to find a path from
+     */ 
+    //int AC_
   
     /** You can modify this method definition as you wish
      *

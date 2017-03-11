@@ -7,11 +7,27 @@
  */
 
 #include "ActorNode.h"
+#include "Movie.h"
 
 /* Getter to return name of movie
  */
 string Movie::getMovie() 
 {
-    return movie;
+    return title;
 }
 
+/*
+ * Returns the year of the movie
+ */
+int Movie::getYear()
+{
+    return year;
+}
+
+/*
+ * Returns the weight of the movie
+ */
+int Movie::getWeight()
+{
+    return 1 + (2015-year);
+}
