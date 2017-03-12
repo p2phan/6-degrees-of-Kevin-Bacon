@@ -19,7 +19,7 @@ string Movie::getMovie()
 /*
  * Returns the year of the movie
  */
-int Movie::getYear()
+int Movie::getYear() const
 {
     return year;
 }
@@ -31,3 +31,16 @@ int Movie::getWeight()
 {
     return 1 + (2015-year);
 }
+
+bool Movie::operator<(const Movie& other)
+{
+    if(getYear() != other.getYear())
+    {
+        return other.getYear() < getYear(); 
+
+    }
+
+    return true;
+
+}
+

@@ -35,6 +35,13 @@ public:
     }
 };
 
+class MoviePtrComp {
+public:
+    bool operator()(Movie*& lhs, Movie*& rhs) const {
+        return *lhs < *rhs;
+    }
+};
+
 /*
  * ActorGraph - a class that is a representative of a graph where
  * actors are nodes, movies are edges, and movie's year is the weight
@@ -56,6 +63,9 @@ public:
      */
     ~ActorGraph();
 
+    /** Resets all the actor nodes for bfs search
+     */
+    void reset();
 
     /** Uses Dijkstra's Alogrithm to find the shortest path
      *  in a weighted graph
@@ -73,6 +83,7 @@ public:
      */
     void printPath(ActorNode* path, ofstream& print);
 
+    
     /** Uses BFs to find the year after which two actors became connected
      *  Parameters: actor1 - one of the actor node to find a path from
      *              actor2 - another actor node to find a path from
@@ -80,13 +91,7 @@ public:
      */ 
     int AC_BFS(string actor1, string actor2);
 
-    /** Uses a disjoint set to find the year after which two actor
-     *  became connected
-     *  Parameters: actor1 - one of the actor node to find a path from
-     *              actor2 - another actor node to find a path from
-     */ 
-    //int AC_
-  
+ 
     /** You can modify this method definition as you wish
      *
      * Load the graph from a tab-delimited file of actor->movie relationships.

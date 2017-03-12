@@ -165,14 +165,16 @@ int UnionFind::connectActors(string actor1, string actor2)
 {
     if(actors.find(actor1) == actors.end() ||
        actors.find(actor2) == actors.end()){
-        return -1;
+        return 9999;
     }
 
-    if(movies.empty()){ return -1; }
+    if(movies.empty()){ return 9999; }
 
     reset();
 
-    int year = std::numeric_limits<int>::max();
+    int min_year = std::numeric_limits<int>::max();
+    int max_year = std::numeric_limits<int>::min();
+    priority_queue<Movie*, vector<Movie*>, MoviePtrComp> sortedMovieYear;
     for(auto it = movies.begin(); it!= movies.end(); it++)
     {
         ///hash_map of hashset
@@ -180,12 +182,27 @@ int UnionFind::connectActors(string actor1, string actor2)
         //every time we will look at the year
         //and store the corresponding year to the hashset of the 
         //year in the hasmap
-        if((*it).second->getYear() < year )
+        Movie* movie = (*it).second;
+        int year = movie->getYear();
+        if(year < min_year )
         {
-            year = (*it).second->getYear();
+            min_year = year;
         }
+
+        if(max_year < year )
+        {
+            max_year = year;
+        }
+        
+        sortedMovieYear.push(movie);
     }
 
+    for(int i = min_year; i <= max_year; i++)
+    {
+
+    }
+
+/*
     while(year <= 2015)
     {
         for(auto it = movies.begin(); it!= movies.end(); it++)
@@ -209,7 +226,7 @@ int UnionFind::connectActors(string actor1, string actor2)
 
         year++;
     }
-
+*/
 
     return -1;
 }

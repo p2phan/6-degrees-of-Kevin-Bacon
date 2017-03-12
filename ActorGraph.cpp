@@ -21,6 +21,18 @@ using namespace std;
 
 ActorGraph::ActorGraph(void) {}
 
+void ActorGraph::reset()
+{
+    //Initializes every vertex in every actor node
+    //to default state
+    for( auto it = actors.begin(); it != actors.end(); ++it)
+    {
+        it->second->v.searched = false;
+        it->second->v.dist = std::numeric_limits<int>::max();
+        it->second->v.prevA = 0;
+        it->second->v.prevM = "";
+    }
+}
 
 /** Uses Dijkstra's algortihm to find the shortest weighted path 
  * between 2 nodes
@@ -39,14 +51,8 @@ ActorNode* ActorGraph::DijkstraTraverse(string actorFrom, string actorTo)
     ActorNode* start = actors[actorFrom];
     ActorNode* end = actors[actorTo];
  
-    //Initializes every vertex in the actor node
-    for( auto it = actors.begin(); it != actors.end(); ++it)
-    {
-        it->second->v.searched = false;
-        it->second->v.dist = std::numeric_limits<int>::max();
-        it->second->v.prevA = 0;
-        it->second->v.prevM = "";
-    }
+    //resets every vertex in the actor node
+    reset();
 
     for( auto it = movies.begin(); it != movies.end(); ++it)
     {
@@ -125,7 +131,6 @@ ActorNode* ActorGraph::DijkstraTraverse(string actorFrom, string actorTo)
  */
 ActorNode* ActorGraph::BFSTraverse(string actorFrom, string actorTo)
 {
- //   cout << "before vector intilization"<< endl;
     //Checks to see if node of actors exist
     if(actors.find(actorFrom) == actors.end() || 
        actors.find(actorTo) == actors.end()){
@@ -135,47 +140,34 @@ ActorNode* ActorGraph::BFSTraverse(string actorFrom, string actorTo)
     ActorNode* start = actors[actorFrom];
     ActorNode* end = actors[actorTo];
     
-    //Initializes every vertex in the actor node
-    for( auto it = actors.begin(); it != actors.end(); ++it)
-    {
-        it->second->v.searched = false;
-        it->second->v.dist = std::numeric_limits<int>::max();
-        it->second->v.prevA = 0;
-        it->second->v.prevM = "";
-    }
+    //Resets every vertex in every actor node
+    reset();
     
     //Makes queue to store path    
     queue<ActorNode*> toExplore;
     toExplore.push(start);
     start->v.dist = 0;
 
- //  cout << "before while" << endl;
     //BFS runs until queue is empty
     while(!toExplore.empty())
     {
         ActorNode* next = toExplore.front();
         toExplore.pop();
      
-   //     cout << "popping " << next->getName() << endl;   
         //Checks through all the neighbors of current actor node
         auto it = next->movie_history.begin();
         for( ; it!= next->movie_history.end(); it++)
         {
-     //       cout << *it << " connects..." <<endl;
             //Each actor in the current is the neighbor of the current node
             string movie_title = *it;
             Movie* movie = movies.at(movie_title);
             auto it2 = movie->cast.begin();
             for( ; it2 != movie->cast.end(); it2++)
             {
-       //         cout << *it2 << " actor in movie" << endl;
                 ActorNode* neighbor = actors.at(*it2);
  
-//cout << neighbor->v.searched << " is bool" << endl;
-//cout << neighbor->v.dist << " is dist" << endl;
                 if(neighbor->v.searched){ continue;}           
                 
-//cout << neighbor->v.prevM<< " is movie" << endl;
                 //If neighbor has not been searched, 
                 //update neighbor accordingly
                 if(next->v.dist+1 < neighbor->v.dist){
@@ -247,71 +239,69 @@ int ActorGraph::AC_BFS(string actor1, string actor2)
 
     if(movies.empty()){ return 9999; }
 
+    reset();
+    for(auto it = actors.begin(); it != actors.end(); it++)
+    {
+        (*it).second->movie_history.clear();
+    }
+
     int min_year = std::numeric_limits<int>::max();
-    unordered_map<int, vector<Movie*>* > sortedMovieYear;
+    int max_year = std::numeric_limits<int>::min();
+    //priority_queue<pair<Movie*, string>> sortedMovieYear;
+    priority_queue<Movie*, vector<Movie*>, MoviePtrComp> sortedMovieYear;
     for(auto it = movies.begin(); it!= movies.end(); it++)
     {
+        //cout << "in for loop" << endl;
         Movie* movie = (*it).second;
         int year = movie->getYear();
 
-        if(year < min_year )
+        if(year < min_year)
         {
             min_year = year;
         }
         
-        //int index =  year-min_year;
-        if(sortedMovieYear.find(year) == sortedMovieYear.end())
+        if(max_year < year )
         {
-            vector<Movie*> v;
-            sortedMovieYear.insert(pair<int, vector<Movie*>* >
-                                       (year, &v));
+            max_year = year;
         }
-        vector<Movie*>* v = sortedMovieYear[year];
-        v->push_back(movie);
-           
+       // cout << (*it).first << endl;
+        //sortedMovieYear.push(pair<Movie*, string>(movie, (*it).first));
+        sortedMovieYear.push(movie);
+
+
     }
-    for(int i = min_year; i < 2015; i++)
+    
+    //cout << min_year << endl;
+    //cout << sortedMovieYear.top()->getMovie() << endl;
+
+    for(int i = min_year; i <= max_year; i++)
     {
-
-        vector<Movie*> v = *(sortedMovieYear[i]);
-        for(int j = 0; j < v.size(); j++)
+        while(!sortedMovieYear.empty())
         {
-            cout << "got movie" << endl;   
-            Movie* movie = v[j];
-            auto it = movie->cast.begin();
-            for( ; it != movie ->cast.end(); it)
-            {
-                ActorNode* actor = actors.at(*it);
-                actor->movie_history.insert();
-            }
-                actor->movie_history.insert(movie_string);
-        }
-        if(BFSTraverse(actor1, actor2)){ return min_year;}
-        min_year++;
-    }
-/*
-
-    while(min_year <= 2015)
-    {
-
-        for(auto it = movies.begin(); it!= movies.end(); it++)
-        {
-            Movie* movie = (*it).second;
-            if(movie->getYear() == min_year)
-            {
-                auto it2 = movie->cast.begin();
-                for( ; it2 != movie->cast.end(); it2++)
-                { 
-                    ActorNode* actor = actors.at(*it2);
-                    actor->movie_history.insert((*it).first);
-                }
-            }
             
+            //Movie* movie = sortedMovieYear.top().first;
+            Movie* movie = sortedMovieYear.top();
+            //cout << movie-> getMovie() << endl;
+            //cout << movie->getYear()<< " v " << i  << endl;
+            if(movie->getYear() != i) {break;} 
+            //string movie_title = sortedMovieYear.top().second;
+            string movie_title = movie->getMovie() + "#@" + to_string(i);
+            //cout << movie_title << endl;
+            sortedMovieYear.pop();
+            //cout << movie->getMovie() << endl; 
+            auto it = movie->cast.begin();
+            for( ; it != movie->cast.end(); it++)
+            { 
+                ActorNode* actor = actors.at(*it);
+                actor->movie_history.insert(movie_title);
+            }
+
         }
-        if(BFSTraverse(actor1, actor2)){ return min_year;}
-        min_year++;
+        //cout << i << endl;
+        if(BFSTraverse(actor1, actor2)){ return i;}
     }
-*/
+    return 9999;
+
 }
 
 /** Does a BFS search to find the shortest path between two actors

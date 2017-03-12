@@ -87,9 +87,10 @@ int main(int argc, char** argv) {
             string actor1(record[0]);
             string actor2(record[1]);
             
-            cout << "Finding earliest year of connection between " 
-                 << actor1 << "and" << actor2 << endl;
+            //cout << "Finding earliest year of connection between " 
+            //     << actor1 << "and" << actor2 << endl;
             int year = graph.AC_BFS(actor1, actor2);
+          
             outfile << actor1 << "\t" << actor2 << "\t" << year << endl;
         }
     }

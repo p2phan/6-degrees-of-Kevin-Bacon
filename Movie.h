@@ -35,12 +35,17 @@ public:
     /*
      * Getter to get the weight calculated as 1+(2015-year)
      */
-    int getYear();
+    int getYear() const;
 
     /*
      * Getter to get the weight calculated as 1+(2015-year)
      */ 
     int getWeight();
+
+    /** Less than comparison, so Movie will work in std::priority_queue
+     *
+     */ 
+    bool operator<(const Movie& other);
 
     /*
      * Constructor
