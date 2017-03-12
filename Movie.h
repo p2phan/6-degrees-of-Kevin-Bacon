@@ -23,6 +23,8 @@ private:
 public:
     
     unordered_set<string> cast; //Stores actor names that was in movie
+    bool searched; //checks to see if the movie has been searched yet
+
     
     /*
      * Getter to get movie

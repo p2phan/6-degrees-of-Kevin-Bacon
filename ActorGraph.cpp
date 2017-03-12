@@ -48,18 +48,29 @@ ActorNode* ActorGraph::DijkstraTraverse(string actorFrom, string actorTo)
         it->second->v.prevM = "";
     }
 
+    for( auto it = movies.begin(); it != movies.end(); ++it)
+    {
+        it->second->searched = false;
+    }
+
+
     //Makes queue to store path    
     priority_queue<ActorNode*, vector<ActorNode*>, ActorNodePtrComp> toExplore;
     toExplore.push(start);
     start->v.dist = 0;
+    int short_dist = -1;
 
     while(!toExplore.empty())
     {
         ActorNode* next = toExplore.top();
         toExplore.pop();
+        if(next->v.dist == short_dist)
+        {
+            return end;
+        }
 
 
-        if(next->v.searched){ continue;}
+        if(next->v.searched){ continue; }
 
         
         next->v.searched = true;
@@ -69,6 +80,8 @@ ActorNode* ActorGraph::DijkstraTraverse(string actorFrom, string actorTo)
         {
             string movie_title = *it;
             Movie* movie = movies.at(movie_title);
+            if(movie->searched){ continue; }
+            movie->searched = true;
             auto it2 = movie->cast.begin();
             for( ; it2 != movie->cast.end(); it2++)
             {
@@ -82,6 +95,10 @@ ActorNode* ActorGraph::DijkstraTraverse(string actorFrom, string actorTo)
                     neighbor->v.prevA = next;
                     neighbor->v.prevM = movie_title;
                     toExplore.push(neighbor);
+
+                    if(neighbor == end){
+                        short_dist = c;
+                    }
                 }
 
 
@@ -222,29 +239,65 @@ int ActorGraph::AC_BFS(string actor1, string actor2)
 {
     if(actors.find(actor1) == actors.end() ||
        actors.find(actor2) == actors.end()){
-        return -1;
+        return 9999;
     }
 
     //ActorNode* start = actors[actorFrom];
     //ActorNode* end = actors[actorTo];   
 
-    if(movies.empty()){ return -1; }
+    if(movies.empty()){ return 9999; }
 
-    int year = std::numeric_limits<int>::max();
+    int min_year = std::numeric_limits<int>::max();
+    unordered_map<int, vector<Movie*>* > sortedMovieYear;
     for(auto it = movies.begin(); it!= movies.end(); it++)
     {
-         if((*it).second->getYear() < year )
-        {
-            year = (*it).second->getYear();
-        }       
-    }
+        Movie* movie = (*it).second;
+        int year = movie->getYear();
 
-    while(year <= 2015)
+        if(year < min_year )
+        {
+            min_year = year;
+        }
+        
+        //int index =  year-min_year;
+        if(sortedMovieYear.find(year) == sortedMovieYear.end())
+        {
+            vector<Movie*> v;
+            sortedMovieYear.insert(pair<int, vector<Movie*>* >
+                                       (year, &v));
+        }
+        vector<Movie*>* v = sortedMovieYear[year];
+        v->push_back(movie);
+           
+    }
+    for(int i = min_year; i < 2015; i++)
     {
+
+        vector<Movie*> v = *(sortedMovieYear[i]);
+        for(int j = 0; j < v.size(); j++)
+        {
+            cout << "got movie" << endl;   
+            Movie* movie = v[j];
+            auto it = movie->cast.begin();
+            for( ; it != movie ->cast.end(); it)
+            {
+                ActorNode* actor = actors.at(*it);
+                actor->movie_history.insert();
+            }
+                actor->movie_history.insert(movie_string);
+        }
+        if(BFSTraverse(actor1, actor2)){ return min_year;}
+        min_year++;
+    }
+/*
+
+    while(min_year <= 2015)
+    {
+
         for(auto it = movies.begin(); it!= movies.end(); it++)
         {
             Movie* movie = (*it).second;
-            if(movie->getYear() == year)
+            if(movie->getYear() == min_year)
             {
                 auto it2 = movie->cast.begin();
                 for( ; it2 != movie->cast.end(); it2++)
@@ -255,10 +308,10 @@ int ActorGraph::AC_BFS(string actor1, string actor2)
             }
             
         }
-        if(BFSTraverse(actor1, actor2)){ return year;}
-        year++;
+        if(BFSTraverse(actor1, actor2)){ return min_year;}
+        min_year++;
     }
-
+*/
 }
 
 /** Does a BFS search to find the shortest path between two actors
@@ -318,7 +371,6 @@ bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) 
                                      new ActorNode(actor_name)));
         }
         
-        ActorNode* actor = actors.at(actor_name);
     //    cout << "actor" << endl; 
     //    cout << actors.at(actor_name)->getName() << endl;
         //Checks to see if there is already a movie
@@ -338,6 +390,7 @@ bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) 
 	//actor->edges.insert(edge);
 	if( use_weighted_edges)
         {
+            ActorNode* actor = actors.at(actor_name);
             actor->movie_history.insert(movie_title_year);
         }
     }

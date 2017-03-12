@@ -18,7 +18,7 @@
 #include "ActorNode.h"
 #include "Movie.h"
 
-using namespace std
+using namespace std;
 
 class UnionFind
 {
@@ -30,7 +30,7 @@ public:
     /*
      * Constructor
      */
-    UnionFind(void);
+    UnionFind(void) {}
 
     /*
      * Destructor
@@ -83,33 +83,33 @@ private:
 /**
  *
  */
-void UF_union(string actor1, string actor2)
+void UnionFind::UF_union(string actor1, string actor2)
 {
     int height1;
     int height2;
 
-    ActorNode* curr1 = actors.find(actor1);
-    ActorNode* curr2 = actors.find(actor2);
+    ActorNode* curr1 = actors[actor1];
+    ActorNode* curr2 = actors[actor2];
     
-    while(curr1->v.prev !=curr1)
+    while(curr1->v.prevA !=curr1)
     {
-        curr1 = curr1->v.prev;
+        curr1 = curr1->v.prevA;
         height1++;
     }
 
-    while(curr2->v.prev !=curr2)
+    while(curr2->v.prevA !=curr2)
     {
-        curr2 = curr2->v.prev;
+        curr2 = curr2->v.prevA;
         height2++;
     }
  
     if(height1 < height2)
     {
-        curr1->v.prev = curr2;
+        curr1->v.prevA = curr2;
     }
     else
     {
-        curr2->v.prev = curr1;
+        curr2->v.prevA = curr1;
     }
 
 
@@ -123,21 +123,21 @@ void UF_union(string actor1, string actor2)
  */
 ActorNode* UnionFind::UF_find(string actor)
 {
-    ActorNode* curr = actors.find(actor);
+    ActorNode* curr = actors[actor];
 
     queue<ActorNode*> compress;
     
-    while(curr->v.prev != curr)
+    while(curr->v.prevA != curr)
     {
         compress.push(curr);
-        curr = curr->v.prev;
+        curr = curr->v.prevA;
     }
 
     while(!compress.empty())
     {
-        ActorNode* reattach = compress.top();
+        ActorNode* reattach = compress.front();
         compress.pop();
-        reattach->v.prev = curr;
+        reattach->v.prevA = curr;
     }
     return curr;
 }
@@ -154,14 +154,14 @@ void UnionFind::reset()
     for(auto it = actors.begin(); it != actors.end(); it++)
     {
         ActorNode* actor = (*it).second;
-        actor->v.prev = actor;
+        actor->v.prevA = actor;
     }
 }
 
 /**
  *
  */
-int UnionFind::connectActors((string actor1, string actor2)
+int UnionFind::connectActors(string actor1, string actor2)
 {
     if(actors.find(actor1) == actors.end() ||
        actors.find(actor2) == actors.end()){
@@ -175,6 +175,11 @@ int UnionFind::connectActors((string actor1, string actor2)
     int year = std::numeric_limits<int>::max();
     for(auto it = movies.begin(); it!= movies.end(); it++)
     {
+        ///hash_map of hashset
+        //key is year
+        //every time we will look at the year
+        //and store the corresponding year to the hashset of the 
+        //year in the hasmap
         if((*it).second->getYear() < year )
         {
             year = (*it).second->getYear();
@@ -189,17 +194,18 @@ int UnionFind::connectActors((string actor1, string actor2)
             if(movie->getYear() == year)
             {
                 auto it2 = movie->cast.begin();
-                //while(it2+1 != movie->cast.end())
-                for( ; it2 != movie->cast.end(); it2++)
+                ActorNode* before = actors.at(*it2);
+                while(++it2 != movie->cast.end())
                 {
-                    if(it2+1 == movie->cast.end()) {break;}
-                    UF_union((*it2).first, *(it2+1).first);               
+                    ActorNode* curr = actors.at(*it2);
+                    UF_union(before->getName(), curr->getName());   
+                    before = curr;            
                 }
             }
 
         }
 
-        if(find(actor1) == find(actor2)) { return year;}
+        if(UF_find(actor1) == UF_find(actor2)) { return year;}
 
         year++;
     }
@@ -257,7 +263,7 @@ bool UnionFind::loadFromFile(const char* in_filename)
         }
 
         ActorNode* actor = actors.at(actor_name);
-        actor->v.prev = actor;
+        actor->v.prevA = actor;
 
         string movie_title_year = movie_title + "#@" + record[2];
         if(movies.find(movie_title_year) == movies.end())

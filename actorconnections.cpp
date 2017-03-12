@@ -8,6 +8,7 @@
  */
 
 #include "ActorGraph.h"
+#include "UnionFind.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -17,14 +18,28 @@ using namespace  std;
 
 int main(int argc, char** argv) {
     //Argument check
-    if(argc != 5)
+
+    string algorithm;
+    if(argc == 4)
+    {
+        algorithm = "ufind";
+
+    }
+    
+    else if(argc == 5)
+    {
+        algorithm = string(argv[4]);
+    }
+    else
     {
         cout << "Invalid number of arguments" << endl;
         cout << "Format is ./actorconnections <file of actor/movies>"
              << "<file of pairs> <output file> bfs/ufind" << endl;
+        return -1;
     }
 
-    ActorGraph graph;
+
+
     //graph.loadFromFile(argv[1], false);
     ifstream infile;
     infile.open(argv[2]);
@@ -38,8 +53,9 @@ int main(int argc, char** argv) {
     ofstream outfile(argv[3]);
     outfile << "Actor1\tActor2\tYear\n";
 
-    if(string(argv[4]) == "bfs")
+    if(algorithm == "bfs")
     {
+        ActorGraph graph;
         graph.loadFromFile(argv[1], false);
         
         bool have_header = false;
@@ -70,8 +86,53 @@ int main(int argc, char** argv) {
             //Get pair of actors
             string actor1(record[0]);
             string actor2(record[1]);
-
+            
+            cout << "Finding earliest year of connection between " 
+                 << actor1 << "and" << actor2 << endl;
             int year = graph.AC_BFS(actor1, actor2);
+            outfile << actor1 << "\t" << actor2 << "\t" << year << endl;
+        }
+    }
+    else if(algorithm == "ufind")
+    {
+        UnionFind set;
+        set.loadFromFile(argv[1]);
+        
+
+        bool have_header = false;
+        while(infile)
+        {
+            //cout<<"inwhile" << endl;
+            string s;
+        
+            if(!getline( infile, s )) break;
+
+            if(!have_header) {
+            //skip the header
+                have_header = true;
+                continue;
+            }
+
+           // cout << "after if's" << endl;
+
+            istringstream ss( s );
+            vector <string> record;
+            //get actors that are delimited by tab
+            while(ss) {
+                string next;
+               
+                if(!getline( ss, next, '\t' )) break;
+
+                record.push_back( next );
+            }
+            if(record.size() != 2) {
+                continue;
+            }
+            //Get pair of actors
+            string actor1(record[0]);
+            string actor2(record[1]);
+           // cout << "after getting pairs"<<endl;
+            int year = set.connectActors(actor1, actor2);
             if(year == -1)
             {
                 outfile << "9999" << endl;
@@ -80,11 +141,7 @@ int main(int argc, char** argv) {
             {
                 outfile << actor1 << "\t" << actor2 << "\t" << year << endl;
             }
-        }
-    }
-    else if(string(argv[4]) == "ufind")
-    {
-
+        }       
     }
     else
     {

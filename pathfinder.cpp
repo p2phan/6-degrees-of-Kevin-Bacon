@@ -38,6 +38,23 @@ int main(int argc, char** argv){
         return -1;
     }
 
+    bool weighted;
+    if(string(argv[2]) == "u")
+    {
+        weighted = false;
+    }
+    else if(string(argv[2]) == "w")
+    {
+        weighted = true;
+    }
+    else
+    {
+        cout << "Invalid 2nd arg. Please input a 'u' or 'w'";
+        infile.close();
+        return -1;
+    }
+
+
    // cout << "finding shortest distances between pairs" << endl;
 
     //Reading pairactor file and printing paths
@@ -87,21 +104,14 @@ int main(int argc, char** argv){
        // cout << actor1 << " is with " << actor2 << endl;
         //Find shortest path between actor 1 and actor 2
         ActorNode* endNode;
-        if(string(argv[2]) == "u")
+        if(!weighted)
         {
             endNode = graph.BFSTraverse(actor1, actor2);
         }
-         else if(string(argv[2]) == "w")
+        else 
         {
             endNode = graph.DijkstraTraverse(actor1, actor2);
         }
-        else
-        {
-            cout << "Invalid 2nd arg. Please input a 'u' or 'w'";
-            infile.close();
-            outfile.close();
-            return -1;
-        } 
 
 
      //   cout << "before print" << endl; 
@@ -116,8 +126,7 @@ int main(int argc, char** argv){
         
 
     }
-    //do bfs
-    //print out
+
     infile.close();
     outfile.close();   
 
