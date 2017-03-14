@@ -22,11 +22,7 @@ int main(int argc, char** argv){
         return -1;
     }
     
-    //cout << "making graph"<< endl;
-    
     ActorGraph graph;
-    //Makes the graph
-    
     graph.loadFromFile(argv[1], true);
 
     ifstream infile;
@@ -54,14 +50,9 @@ int main(int argc, char** argv){
         return -1;
     }
 
-
-   // cout << "finding shortest distances between pairs" << endl;
-
     //Reading pairactor file and printing paths
     ofstream outfile(argv[4]);
     outfile << "(actor)--[movie#@year]-->(actor)--...\n";
-
-    //cout << "header" << endl;
 
     bool have_header = false;
 
@@ -77,13 +68,12 @@ int main(int argc, char** argv){
             continue;
         }
 
-        //cout << "before header" <<endl;
         istringstream ss( s );
         vector <string> record;
+        
         //get actors that are delimited by tab
         while (ss) {
             string next;
-
 
             if (!getline( ss, next, '\t' )) break;
 
@@ -100,9 +90,9 @@ int main(int argc, char** argv){
         
         cout << "Calculating path for " << actor1 
              << " and " << actor2 << endl;
-       // cout << "before bfs" << endl;
-       // cout << actor1 << " is with " << actor2 << endl;
-        //Find shortest path between actor 1 and actor 2
+        
+        //Find shortest path between actor 1 and actor 2 based on weighted
+        //or unweighted edges
         ActorNode* endNode;
         if(!weighted)
         {
@@ -113,8 +103,6 @@ int main(int argc, char** argv){
             endNode = graph.DijkstraTraverse(actor1, actor2);
         }
 
-
-     //   cout << "before print" << endl; 
         if(endNode)
         {
             graph.printPath(endNode, outfile);
@@ -123,14 +111,8 @@ int main(int argc, char** argv){
         {
             outfile << "No Path" << endl;
         }
-        
-
     }
 
     infile.close();
     outfile.close();   
-
-   // cout << "done " <<endl;
-
-
 }

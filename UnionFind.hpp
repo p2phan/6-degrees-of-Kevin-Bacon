@@ -7,7 +7,7 @@
  *  Date:   03/10/17
  *
  *  Implements a disjoint set that allows us to keep track
- *  of all cthe connected sets of actors.
+ *  of all the connected sets of actors.
  */
 
 #include <iostream>
@@ -68,7 +68,7 @@ public:
 
     /** Finds the sentinel thorugh path compresssion
      * 
-     *  Parameter: actor - node from which to find sential
+     *  Parameter: actor - node from which to find sentinel
      */
     ActorNode* UF_find(string actor);
 
@@ -76,28 +76,30 @@ public:
      *  Resets the unions
      */  
     void reset();
-
-    /** Return the year after which two actors become connected
-     *  through a disjoint implementation
+    
+    /**
+     * Returns the year after which two actors become connected
+     * through a disjoint implementation
      *
-     *  Parameter: actor1 - first actor string to find connection 
-     *             actor2 - second actor string to find connections
+     * Parameter: in_filename - input file to get the actor pairs
+     *            out_filename - output file that stores the information 
      */
     void connectActors(const char* in_filename, const char* out_filename); 
 
 
-    /** You can modify this method definition as you wish
-     *
+    /** 
      * Load the graph from a tab-delimited file of actor->movie relationships.
      *
      * in_filename - input filename
      *
-     * return true if file was loaded sucessfully, false otherwise
+     * Return true if file was loaded sucessfully, false otherwise
      */
-
     bool loadFromFile(const char* in_filename);
 
 private:
+    /**
+     * Helper method for destructor
+     */ 
     void deleteAll();
 };
 
@@ -143,11 +145,8 @@ bool UnionFind::loadPairsFromFile(vector<pair<string, string>> &pairs,
         string actor1(record[0]);
         string actor2(record[1]);
 
-        pairs.push_back(pair<string, string>(actor1, actor2));
-            
-
+        pairs.push_back(pair<string, string>(actor1, actor2));            
     }
-
     if (!infile.eof()) {
         cerr << "Failed to read " << in_filename << "!\n";
         return false;
@@ -166,8 +165,6 @@ bool UnionFind::loadPairsFromFile(vector<pair<string, string>> &pairs,
 void UnionFind::printConnections(vector<pair<string, string>> &pairs,
                           vector<int> &years, const char* out_filename)
 {
-    cout << pairs.size() << endl;
-
     ofstream outfile(out_filename);
     outfile << "Actor1\tActor2\tYear\n";
 
@@ -179,11 +176,14 @@ void UnionFind::printConnections(vector<pair<string, string>> &pairs,
 
     }
     outfile.close();
-
 }
 
 /**
+ * Makes the sentinel of the shorter set point to the sentinel
+ * of the longer set
  *
+ * Parameter: actor1 - actor node from the set to union
+ *            actor2 - other actor node from the set to union
  */
 void UnionFind::UF_union(string actor1, string actor2)
 {
@@ -193,6 +193,7 @@ void UnionFind::UF_union(string actor1, string actor2)
     ActorNode* curr1 = actors[actor1];
     ActorNode* curr2 = actors[actor2];
     
+    //Get heights from both sets   
     while(curr1->v.prevA !=curr1)
     {
         curr1 = curr1->v.prevA;
@@ -205,6 +206,7 @@ void UnionFind::UF_union(string actor1, string actor2)
         height2++;
     }
  
+    //Check which set points to which set based on height
     if(height1 < height2)
     {
         curr1->v.prevA = curr2;
@@ -213,28 +215,27 @@ void UnionFind::UF_union(string actor1, string actor2)
     {
         curr2->v.prevA = curr1;
     }
-
-
 }
 
-
-/*
+/**
+ * Finds the sentinel through path compression 
  *
- *
- *
+ * Parameter: actor - node from which to find the sentinel
  */
 ActorNode* UnionFind::UF_find(string actor)
 {
     ActorNode* curr = actors[actor];
 
     queue<ActorNode*> compress;
-    
+ 
+    //Stores pathway to sentinel in a queue   
     while(curr->v.prevA != curr)
     {
         compress.push(curr);
         curr = curr->v.prevA;
     }
-
+    
+    //Get the sentinel, which is at the end of the queue
     while(!compress.empty())
     {
         ActorNode* reattach = compress.front();
@@ -244,12 +245,8 @@ ActorNode* UnionFind::UF_find(string actor)
     return curr;
 }
 
-
-
-/*
- *
- *
- *
+/**
+ * Resets the unions
  */
 void UnionFind::reset()
 {
@@ -261,18 +258,14 @@ void UnionFind::reset()
 }
 
 /**
+ * Returns the year after which two actors become connected
+ * through a disjoint implementation
  *
+ * Parameter: in_filename - input file to get the actor pairs
+ *            out_filename - output file that stores the information 
  */
 void UnionFind::connectActors(const char* in_filename, const char* out_filename)
 {
-/*    if(actors.find(actor1) == actors.end() ||
-       actors.find(actor2) == actors.end()){
-        return 9999;
-    }
-
-    if(movies.empty()){ return 9999; }
-*/
-    //reset();
     int min_year = std::numeric_limits<int>::max();
     int max_year = std::numeric_limits<int>::min();
     priority_queue<Movie*, vector<Movie*>, MoviePtrComp> sortedMovieYear;
@@ -297,7 +290,6 @@ void UnionFind::connectActors(const char* in_filename, const char* out_filename)
     loadPairsFromFile(pairs, in_filename);
     vector<int> years(pairs.size(), 9999);
 
-    //cout << years.size() << endl;
     
     for(int i = min_year; i <= max_year; i++)
     {
@@ -323,53 +315,20 @@ void UnionFind::connectActors(const char* in_filename, const char* out_filename)
         //turn into for loop
         for(int j = 0; j < pairs.size(); j++)
         {
-            //cout << years[j] << " and actors " << pairs[j].first
-            //     << " " << pairs[j].second <<endl;
             if(years[j] == 9999 &&
                UF_find(pairs[j].first) == UF_find(pairs[j].second))
             {
                 years[j] = i;
             }
-
         }
-
     }
-
     printConnections(pairs, years, out_filename);
-    //  cout << "here" << endl;
-    //return 9999;
-
-/*
-    while(year <= 2015)
-    {
-        for(auto it = movies.begin(); it!= movies.end(); it++)
-        {
-            Movie* movie = (*it).second;
-            if(movie->getYear() == year)
-            {
-                auto it2 = movie->cast.begin();
-                ActorNode* before = actors.at(*it2);
-                while(++it2 != movie->cast.end())
-                {
-                    ActorNode* curr = actors.at(*it2);
-                    UF_union(before->getName(), curr->getName());   
-                    before = curr;            
-                }
-            }
-
-        }
-
-        if(UF_find(actor1) == UF_find(actor2)) { return year;}
-
-        year++;
-    }
-*/
-
 }
 
 /**
+ * Load the graph from a tab-delimited file of actor->movie relationships
  *
- *
+ * Parameter: in_filename - input filename
  */
 bool UnionFind::loadFromFile(const char* in_filename)
 {

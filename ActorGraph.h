@@ -35,7 +35,7 @@ public:
 };
 
 /** A 'function class' for use as the Compare class in a
- *  priority_queue<ActorNode*>.
+ *  priority_queue<Movie*>.
  *  We will make it so that lowest distance
  *  has the highest priority
  */
@@ -107,17 +107,15 @@ public:
     void printConnections(vector<pair<string, string>> &pairs,
                           vector<int> &years, const char* out_filename);
 
-   
-    /** Uses BFs to find the year after which two actors became connected
-     *  Parameters: actor1 - one of the actor node to find a path from
-     *              actor2 - another actor node to find a path from
-     *      
-     */ 
+    /** Returns the year after which two actors became connected
+     *  using a BFS
+     *  Parameter: in_filename - input file to read the pairs of actors
+     *             out_filename - output file to put information to
+     */
     void AC_BFS(const char* in_filename, const char* out_filename);
 
  
-    /** You can modify this method definition as you wish
-     *
+    /** 
      * Load the graph from a tab-delimited file of actor->movie relationships.
      *
      * in_filename - input filename

@@ -4,8 +4,8 @@
  *         Dephanie Ho
  * Date:   02/28/2017
  *
- * This file is meant to exist as a container for starter code that you can use to read the input file format
- * defined in movie_casts.tsv. Feel free to modify any/all aspects as you wish.
+ * Class that is representative of a graph where actors are nodes,
+ * movies are edges, and a movie's year is the weight.
  */
  
 #include <fstream>
@@ -21,6 +21,8 @@ using namespace std;
 
 ActorGraph::ActorGraph(void) {}
 
+/** Resets all the actor nodes for BFS search
+ */
 void ActorGraph::reset()
 {
     //Initializes every vertex in every actor node
@@ -269,15 +271,12 @@ bool ActorGraph::loadPairsFromFile(vector<pair<string, string>> &pairs,
             string actor2(record[1]);
 
             pairs.push_back(pair<string, string>(actor1, actor2));
-
         }
-
     if (!infile.eof()) {
         cerr << "Failed to read " << in_filename << "!\n";
         return false;
     }
     infile.close();
-
 }
 
 /**
@@ -291,45 +290,25 @@ bool ActorGraph::loadPairsFromFile(vector<pair<string, string>> &pairs,
 void ActorGraph::printConnections(vector<pair<string, string>> &pairs,
                           vector<int> &years, const char* out_filename)
 {
-
     ofstream outfile(out_filename);
     outfile << "Actor1\tActor2\tYear\n";
 
     for(int i = 0; i < pairs.size(); i++)
     {
-
         outfile << pairs[i].first << "\t" << pairs[i].second << "\t"
                 << years[i] << endl;
-
     }
 
     outfile.close();
-
-
 }
 
 /** Returns the year after which two actors became connected
  *  using a BFS
- *  Paremter: actor1 - 1st actor to find year of connection
- *            actor2 - 2nd actor to find year of connection
+ *  Parameter: in_filename - input file to read the pairs of actors
+ *             out_filename - output file to put information to
  */
 void ActorGraph::AC_BFS(const char* in_filename, const char* out_filename)
 {
-    //Checks to see if paths between two actors are possible
-/*    if(actors.find(actor1) == actors.end() ||
-       actors.find(actor2) == actors.end()){
-        return 9999;
-    }
-    if(movies.empty()){ return 9999; }
-
-    reset();
-
-    for(auto it = actors.begin(); it != actors.end(); it++)
-    {
-        (*it).second->movie_history.clear();
-    }
-*/
-
     int min_year = std::numeric_limits<int>::max();
     int max_year = std::numeric_limits<int>::min();
     
@@ -358,7 +337,6 @@ void ActorGraph::AC_BFS(const char* in_filename, const char* out_filename)
    
     for(int i = min_year; i <= max_year; i++)
     {
-        cout << i << endl;
         while(!sortedMovieYear.empty())
         {            
             Movie* movie = sortedMovieYear.top();
@@ -380,25 +358,21 @@ void ActorGraph::AC_BFS(const char* in_filename, const char* out_filename)
             if(years[j] == 9999 && 
                BFSTraverse(pairs[j].first, pairs[j].second))
             {
-   //             cout << "here" << endl;
                 years[j] = i;
             }
-
         }
 
-
         printConnections(pairs, years, out_filename);
-
-        //if(BFSTraverse(actor1, actor2)){ return i;}
     }
- //   return 9999;
 }
-
-/** Does a BFS search to find the shortest path between two actors
+/** 
+ * Load the graph from a tab-delimited file of actor->movie relationships.
  *
- *  Parameter: actorFrom - starting actor to search from
- *             actorTo - ending actor to search to
+ * in_filename - input filename
+ * use_weighted_edges - if true, compute edge weights as 1+(2015 - movie_year),
+ * otherwise all edge weights will be 1
  *
+ * return true if file was loaded sucessfully, false otherwise
  */
 bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) {
     // Initialize the file stream
@@ -436,7 +410,6 @@ bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) 
             continue;
         }
 
-
         string actor_name(record[0]);
         string movie_title(record[1]);
         int movie_year = stoi(record[2]);
@@ -461,7 +434,7 @@ bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) 
         Movie* movie = movies.at(movie_title_year);
         movie->cast.insert(actor_name);
 	
-	if( use_weighted_edges)
+	if(use_weighted_edges)
         {
             ActorNode* actor = actors.at(actor_name);
             actor->movie_history.insert(movie_title_year);

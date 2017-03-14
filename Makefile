@@ -16,8 +16,6 @@ endif
 
 all: pathfinder actorconnections
 
-
-
 # include what ever source code *.h files pathfinder relies on (these are merely the ones that were used in the solution)
 
 pathfinder: Movie.o ActorNode.o ActorEdge.o ActorGraph.o
@@ -29,8 +27,6 @@ actorconnections: Movie.o ActorNode.o ActorEdge.o ActorGraph.o
 # Note: you do not have to include a *.cpp file if it aleady has a paired *.h file that is already included with class/method headers
 
 ActorGraph.o: ActorNode.h Movie.h ActorEdge.h ActorGraph.h UnionFind.hpp
-
-#UnionFind.o: ActorNode.h Movie.h ActorEdge.h UnionFind.hpp
 
 clean:
 	rm -f pathfinder actorconnections *.o core*

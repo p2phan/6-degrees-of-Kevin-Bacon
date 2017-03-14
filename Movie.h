@@ -24,12 +24,10 @@ public:
     unordered_set<string> cast; //Stores actor names that was in movie
     bool searched; //checks to see if the movie has been searched yet
 
-    
     /*
      * Getter to get movie
      */
     string getMovie();
-
 
     /*
      * Getter to get the weight calculated as 1+(2015-year)
@@ -50,8 +48,6 @@ public:
      * Constructor
      */
     Movie(string movie, int movieYear): title(movie), year(movieYear) {}
-
-    
 };
 
 #endif //MOVIE_H

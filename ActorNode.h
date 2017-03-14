@@ -16,7 +16,6 @@ class ActorNode {
 private:
     string name; //Name of actor
 
-
 public:
     struct Vertex{
         bool searched; //Bool to check if vertex has been searched 
@@ -33,8 +32,6 @@ public:
      */
     string getName();
 
-    //ActorNode(string actor): name(actor), searched(0), prev(0),
-                             //dist(std::numeric_limits<int>::max()) {}
     /*
      * Constructor
      */
