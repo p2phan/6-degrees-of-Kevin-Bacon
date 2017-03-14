@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
 
 
     //graph.loadFromFile(argv[1], false);
-    ifstream infile;
+/*    ifstream infile;
     infile.open(argv[2]);
 
     if(!infile.is_open())
@@ -52,8 +52,8 @@ int main(int argc, char** argv) {
 
     ofstream outfile(argv[3]);
     outfile << "Actor1\tActor2\tYear\n";
-
-    if(algorithm == "bfs")
+*/
+/*    if(algorithm == "bfs")
     {
         ActorGraph graph;
         graph.loadFromFile(argv[1], false);
@@ -148,7 +148,31 @@ int main(int argc, char** argv) {
     {
         cout << "Invalid 4th arg. Please input a 'bfs' or 'ufind'";
     }
-    
+ */
+
+     if(algorithm == "bfs")
+    {
+        ActorGraph graph;
+        graph.loadFromFile(argv[1], false);
+        
+        graph.AC_BFS(argv[2], argv[3]);
+
+    }
+    else if(algorithm == "ufind")
+    {
+        UnionFind set;
+        set.loadFromFile(argv[1]);
+        
+        set.connectActors(argv[2], argv[3]);
+        
+
+   }
+    else
+    {
+        cout << "Invalid 4th arg. Please input a 'bfs' or 'ufind'";
+    }
+   
+
 
 
     //check if there is 4 args

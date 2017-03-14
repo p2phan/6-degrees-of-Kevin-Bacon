@@ -1,4 +1,4 @@
-/*
+/**
  * ActorGraph.h
  * Author: Peter Phan, 
  *         Dephanie Ho
@@ -46,7 +46,7 @@ public:
     }
 };
 
-/*
+/**
  * ActorGraph - a class that is a representative of a graph where
  * actors are nodes, movies are edges, and movie's year is the weight
  */
@@ -57,12 +57,12 @@ protected:
     // Maybe add class data structure(s) here
 
 public:
-    /* 
+    /** 
      * Constructor
      */
     ActorGraph(void);
      
-    /*
+    /**
      * Destructor
      */
     ~ActorGraph();
@@ -70,14 +70,14 @@ public:
     /** Resets all the actor nodes for bfs search
      */
     void reset();
+  
 
     /** Uses Dijkstra's Alogrithm to find the shortest path
      *  in a weighted graph
      */ 
-
     ActorNode* DijkstraTraverse(string actorFrom, string actorTo);
 
-    /*
+    /**
      *  Traverse the graph using BFS
      */
     ActorNode* BFSTraverse(string actorFrom, string actorTo);
@@ -87,13 +87,33 @@ public:
      */
     void printPath(ActorNode* path, ofstream& print);
 
-    
+    /**
+     *  Uploads a pair of actor strings into the vector
+     *
+     *  Parameter: v - the vector to upload the pair of actor strings to
+     *             in_filename -  name of file to read pairs 
+     */  
+    bool loadPairsFromFile(vector<pair<string, string>> &pairs,
+                           const char* in_filename);
+
+    /**
+     * Prints out the information to file
+     *
+     * Parameter: pairs - vector of actor string pairs
+     *            years - vectors of year corresponding to when pairs 
+     *            first become connected
+     *            out_filename - name to file to write to
+     */
+    void printConnections(vector<pair<string, string>> &pairs,
+                          vector<int> &years, const char* out_filename);
+
+   
     /** Uses BFs to find the year after which two actors became connected
      *  Parameters: actor1 - one of the actor node to find a path from
      *              actor2 - another actor node to find a path from
      *      
      */ 
-    int AC_BFS(string actor1, string actor2);
+    void AC_BFS(const char* in_filename, const char* out_filename);
 
  
     /** You can modify this method definition as you wish
@@ -108,7 +128,7 @@ public:
     bool loadFromFile(const char* in_filename, bool use_weighted_edges);
     
 private:
-    /*
+    /**
      * Helper method for destructor
      */
     void deleteAll();  

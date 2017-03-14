@@ -32,6 +32,12 @@ void ActorGraph::reset()
         it->second->v.prevA = 0;
         it->second->v.prevM = "";
     }
+
+    for( auto it = movies.begin(); it != movies.end(); ++it)
+    {
+        it->second->searched = false;
+    }
+
 }
 
 /** Uses Dijkstra's algortihm to find the shortest weighted path 
@@ -53,11 +59,6 @@ ActorNode* ActorGraph::DijkstraTraverse(string actorFrom, string actorTo)
  
     //resets every vertex in the actor node
     reset();
-
-    for( auto it = movies.begin(); it != movies.end(); ++it)
-    {
-        it->second->searched = false;
-    }
 
 
     //Makes queue to store path    
@@ -163,7 +164,8 @@ ActorNode* ActorGraph::BFSTraverse(string actorFrom, string actorTo)
         {
             string movie_title = *it;
             Movie* movie = movies.at(movie_title);
-            
+            if(movie->searched){ continue; }
+            movie->searched = true;           
             //Each actor in the movie is the neighbor of the current node
             auto it2 = movie->cast.begin();
             for( ; it2 != movie->cast.end(); it2++)
@@ -179,6 +181,7 @@ ActorNode* ActorGraph::BFSTraverse(string actorFrom, string actorTo)
                     neighbor->v.dist = next->v.dist+1;
                     neighbor->v.prevA = next;
                     neighbor->v.prevM = movie_title;
+                    
                     toExplore.push(neighbor);
                 }
                 //We want the node if reached the end 
@@ -223,15 +226,97 @@ void ActorGraph::printPath(ActorNode* path, ofstream& out)
     out << "\n";
 }
 
+
+/**
+ *  Uploads a pair of actor strings into the vector
+ *
+ *  Parameter: v - the vector to upload the pair of actor strings to
+ *             in_filename -  name of file to read pairs 
+ */
+bool ActorGraph::loadPairsFromFile(vector<pair<string, string>> &pairs,
+                           const char* in_filename)
+{
+    ifstream infile(in_filename);
+
+    bool have_header = false;
+
+    while(infile)
+        {
+            string s;
+
+            if(!getline( infile, s )) break;
+
+            if(!have_header) {
+            //skip the header 
+                have_header = true;
+                continue;
+            }
+            istringstream ss( s );
+            vector <string> record;
+            //get actors that are delimited by tab
+            while(ss) {
+                string next;
+
+                if(!getline( ss, next, '\t' )) break;
+
+                record.push_back( next );
+            }
+            if(record.size() != 2) {
+                continue;
+            }
+            //Get pair of actors
+            string actor1(record[0]);
+            string actor2(record[1]);
+
+            pairs.push_back(pair<string, string>(actor1, actor2));
+
+        }
+
+    if (!infile.eof()) {
+        cerr << "Failed to read " << in_filename << "!\n";
+        return false;
+    }
+    infile.close();
+
+}
+
+/**
+ * Prints out the information to file
+ *
+ * Parameter: pairs - vector of actor string pairs
+ *            years - vectors of year corresponding to when pairs 
+ *            first become connected
+ *            out_filename - name to file to write to
+ */
+void ActorGraph::printConnections(vector<pair<string, string>> &pairs,
+                          vector<int> &years, const char* out_filename)
+{
+
+    ofstream outfile(out_filename);
+    outfile << "Actor1\tActor2\tYear\n";
+
+    for(int i = 0; i < pairs.size(); i++)
+    {
+
+        outfile << pairs[i].first << "\t" << pairs[i].second << "\t"
+                << years[i] << endl;
+
+    }
+
+    outfile.close();
+
+
+}
+
 /** Returns the year after which two actors became connected
  *  using a BFS
  *  Paremter: actor1 - 1st actor to find year of connection
  *            actor2 - 2nd actor to find year of connection
  */
-int ActorGraph::AC_BFS(string actor1, string actor2)
+void ActorGraph::AC_BFS(const char* in_filename, const char* out_filename)
 {
     //Checks to see if paths between two actors are possible
-    if(actors.find(actor1) == actors.end() ||
+/*    if(actors.find(actor1) == actors.end() ||
        actors.find(actor2) == actors.end()){
         return 9999;
     }
@@ -243,6 +328,7 @@ int ActorGraph::AC_BFS(string actor1, string actor2)
     {
         (*it).second->movie_history.clear();
     }
+*/
 
     int min_year = std::numeric_limits<int>::max();
     int max_year = std::numeric_limits<int>::min();
@@ -264,9 +350,15 @@ int ActorGraph::AC_BFS(string actor1, string actor2)
         }
         sortedMovieYear.push(movie);
     }
-    
+ 
+    vector<pair<string, string>> pairs;
+    loadPairsFromFile(pairs, in_filename);
+    vector<int> years(pairs.size(), 9999);
+
+   
     for(int i = min_year; i <= max_year; i++)
     {
+        cout << i << endl;
         while(!sortedMovieYear.empty())
         {            
             Movie* movie = sortedMovieYear.top();
@@ -282,9 +374,24 @@ int ActorGraph::AC_BFS(string actor1, string actor2)
                 actor->movie_history.insert(movie_title);
             }
         }
-        if(BFSTraverse(actor1, actor2)){ return i;}
+
+        for(int j = 0; j < pairs.size(); j++)
+        {
+            if(years[j] == 9999 && 
+               BFSTraverse(pairs[j].first, pairs[j].second))
+            {
+   //             cout << "here" << endl;
+                years[j] = i;
+            }
+
+        }
+
+
+        printConnections(pairs, years, out_filename);
+
+        //if(BFSTraverse(actor1, actor2)){ return i;}
     }
-    return 9999;
+ //   return 9999;
 }
 
 /** Does a BFS search to find the shortest path between two actors

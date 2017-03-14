@@ -37,6 +37,27 @@ public:
      */
     ~UnionFind();
 
+    /**
+     *  Uploads a pair of actor strings into the vector
+     *
+     *  Parameter: v - the vector to upload the pair of actor strings to
+     *             in_filename -  name of file to read pairs 
+     */
+    bool loadPairsFromFile(vector<pair<string, string>> &v,
+                           const char* in_filename);
+
+    /**
+     * Prints out the information to file
+     *
+     * Parameter: pairs - vector of actor string pairs
+     *            years - vectors of year corresponding to when pairs 
+     *            first become connected
+     *            out_filename - name to file to write to
+     */
+    void printConnections(vector<pair<string, string>> &pairs,
+                          vector<int> &years, const char* out_filename);
+
+
     /** Makes the sentinel of the shorter set point to the sentinel
      *  of the longer set
      *
@@ -62,7 +83,7 @@ public:
      *  Parameter: actor1 - first actor string to find connection 
      *             actor2 - second actor string to find connections
      */
-    int connectActors(string actor1, string actor2); 
+    void connectActors(const char* in_filename, const char* out_filename); 
 
 
     /** You can modify this method definition as you wish
@@ -79,6 +100,87 @@ public:
 private:
     void deleteAll();
 };
+
+/**
+ *  Uploads a pair of actor strings into the vector
+ *
+ *  Parameter: v - the vector to upload the pair of actor strings to
+ *             in_filename -  name of file to read pairs 
+ */
+bool UnionFind::loadPairsFromFile(vector<pair<string, string>> &pairs,
+                           const char* in_filename)
+{
+    ifstream infile(in_filename);
+
+    bool have_header = false;
+
+    while(infile)
+    {   
+        string s;
+            
+        if(!getline( infile, s )) break;
+            
+        if(!have_header) {
+        //skip the header 
+            have_header = true;
+            continue;
+        }
+        istringstream ss( s );
+        vector <string> record;
+        //get actors that are delimited by tab
+        
+        while(ss) {
+            string next;
+                
+            if(!getline( ss, next, '\t' )) break;
+                
+            record.push_back( next );
+        }
+        if(record.size() != 2) {
+            continue;
+        }
+        //Get pair of actors
+        string actor1(record[0]);
+        string actor2(record[1]);
+
+        pairs.push_back(pair<string, string>(actor1, actor2));
+            
+
+    }
+
+    if (!infile.eof()) {
+        cerr << "Failed to read " << in_filename << "!\n";
+        return false;
+    }
+    infile.close();
+}
+
+/**
+ * Prints out the information to file
+ *
+ * Parameter: pairs - vector of actor string pairs
+ *            years - vectors of year corresponding to when pairs 
+ *            first become connected
+ *            out_filename - name to file to write to
+ */
+void UnionFind::printConnections(vector<pair<string, string>> &pairs,
+                          vector<int> &years, const char* out_filename)
+{
+    cout << pairs.size() << endl;
+
+    ofstream outfile(out_filename);
+    outfile << "Actor1\tActor2\tYear\n";
+
+    for(int i = 0; i < pairs.size(); i++)
+    {
+
+        outfile << pairs[i].first << "\t" << pairs[i].second << "\t" 
+                << years[i] << endl; 
+
+    }
+    outfile.close();
+
+}
 
 /**
  *
@@ -161,27 +263,21 @@ void UnionFind::reset()
 /**
  *
  */
-int UnionFind::connectActors(string actor1, string actor2)
+void UnionFind::connectActors(const char* in_filename, const char* out_filename)
 {
-    if(actors.find(actor1) == actors.end() ||
+/*    if(actors.find(actor1) == actors.end() ||
        actors.find(actor2) == actors.end()){
         return 9999;
     }
 
     if(movies.empty()){ return 9999; }
-
-    reset();
-
+*/
+    //reset();
     int min_year = std::numeric_limits<int>::max();
     int max_year = std::numeric_limits<int>::min();
     priority_queue<Movie*, vector<Movie*>, MoviePtrComp> sortedMovieYear;
     for(auto it = movies.begin(); it!= movies.end(); it++)
     {
-        ///hash_map of hashset
-        //key is year
-        //every time we will look at the year
-        //and store the corresponding year to the hashset of the 
-        //year in the hasmap
         Movie* movie = (*it).second;
         int year = movie->getYear();
         if(year < min_year )
@@ -197,6 +293,12 @@ int UnionFind::connectActors(string actor1, string actor2)
         sortedMovieYear.push(movie);
     }
 
+    vector<pair<string, string>> pairs;
+    loadPairsFromFile(pairs, in_filename);
+    vector<int> years(pairs.size(), 9999);
+
+    //cout << years.size() << endl;
+    
     for(int i = min_year; i <= max_year; i++)
     {
 
@@ -218,13 +320,24 @@ int UnionFind::connectActors(string actor1, string actor2)
             }   
 
         }
-        //cout << UF_find(actor1)->getName() << " " << UF_find(actor2)->getName() << endl;
-        if(UF_find(actor1) == UF_find(actor2)) { return i;}
+        //turn into for loop
+        for(int j = 0; j < pairs.size(); j++)
+        {
+            //cout << years[j] << " and actors " << pairs[j].first
+            //     << " " << pairs[j].second <<endl;
+            if(years[j] == 9999 &&
+               UF_find(pairs[j].first) == UF_find(pairs[j].second))
+            {
+                years[j] = i;
+            }
+
+        }
 
     }
 
-    cout << "here" << endl;
-    return 9999;
+    printConnections(pairs, years, out_filename);
+    //  cout << "here" << endl;
+    //return 9999;
 
 /*
     while(year <= 2015)
@@ -252,7 +365,6 @@ int UnionFind::connectActors(string actor1, string actor2)
     }
 */
 
-    return -1;
 }
 
 /**
