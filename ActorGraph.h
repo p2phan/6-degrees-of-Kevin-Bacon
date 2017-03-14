@@ -12,7 +12,6 @@
 #define ACTORGRAPH_H
 
 #include "ActorNode.h"
-#include "ActorEdge.h"
 #include "Movie.h"
 
 #include <iostream>
@@ -35,6 +34,11 @@ public:
     }
 };
 
+/** A 'function class' for use as the Compare class in a
+ *  priority_queue<ActorNode*>.
+ *  We will make it so that lowest distance
+ *  has the highest priority
+ */
 class MoviePtrComp {
 public:
     bool operator()(Movie*& lhs, Movie*& rhs) const {
@@ -109,6 +113,5 @@ private:
      */
     void deleteAll();  
 };
-
 
 #endif // ACTORGRAPH_H

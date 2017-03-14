@@ -200,7 +200,25 @@ int UnionFind::connectActors(string actor1, string actor2)
     for(int i = min_year; i <= max_year; i++)
     {
 
+        while(!sortedMovieYear.empty())
+        {
+            Movie* movie = sortedMovieYear.top();
+            if(movie->getYear() != i) {break;}
+            string movie_title = movie->getMovie() + "#@" + to_string(i);
+            sortedMovieYear.pop();
+            auto it = movie->cast.begin();
+            for( ; it != movie->cast.end(); it++)
+            {
+                ActorNode* actor = actors.at(*it);
+                actor->movie_history.insert(movie_title);
+            }   
+        }
+
+        if(UF_find(actor1) == UF_find(actor2)) { return i;}
+
     }
+
+    return 9999;
 
 /*
     while(year <= 2015)

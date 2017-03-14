@@ -66,28 +66,35 @@ ActorNode* ActorGraph::DijkstraTraverse(string actorFrom, string actorTo)
     start->v.dist = 0;
     int short_dist = -1;
 
+    //DijkstraTraverse until queue is empty
     while(!toExplore.empty())
     {
         ActorNode* next = toExplore.top();
         toExplore.pop();
+        
+        //If the distance that is popped equals the current 
+        //shortest path, then it will be the shortest possible path, so 
+        //return the end node. 
         if(next->v.dist == short_dist)
         {
             return end;
         }
 
-
         if(next->v.searched){ continue; }
-
         
         next->v.searched = true;
-            
+     
+        //Checks through all the neighbors of current actor node       
         auto it = next->movie_history.begin();
         for( ; it!= next->movie_history.end(); it++)
         {
             string movie_title = *it;
             Movie* movie = movies.at(movie_title);
+
             if(movie->searched){ continue; }
             movie->searched = true;
+
+            //Each actor in the movie is the neighbor of the current node
             auto it2 = movie->cast.begin();
             for( ; it2 != movie->cast.end(); it2++)
             {
@@ -95,26 +102,22 @@ ActorNode* ActorGraph::DijkstraTraverse(string actorFrom, string actorTo)
                 
                 int c = next->v.dist + movie->getWeight();
 
-                //update neighbor accordingly
+                //Update neighbor accordingly
                 if(c < neighbor->v.dist){
                     neighbor->v.dist = c;
                     neighbor->v.prevA = next;
                     neighbor->v.prevM = movie_title;
                     toExplore.push(neighbor);
-
+                    
+                    //Keeps track of the current shortest path
                     if(neighbor == end){
                         short_dist = c;
                     }
                 }
-
-
-            }
-   
-
+            }   
         }         
-
     }
-
+    //If end node is never searched, there is no possible path between the actors
     if(!end->v.searched)
     {
         return 0;
@@ -158,9 +161,10 @@ ActorNode* ActorGraph::BFSTraverse(string actorFrom, string actorTo)
         auto it = next->movie_history.begin();
         for( ; it!= next->movie_history.end(); it++)
         {
-            //Each actor in the current is the neighbor of the current node
             string movie_title = *it;
             Movie* movie = movies.at(movie_title);
+            
+            //Each actor in the movie is the neighbor of the current node
             auto it2 = movie->cast.begin();
             for( ; it2 != movie->cast.end(); it2++)
             {
@@ -179,11 +183,9 @@ ActorNode* ActorGraph::BFSTraverse(string actorFrom, string actorTo)
                 }
                 //We want the node if reached the end 
                 if(neighbor == end){ return end;}
-                
             }
         }
     }
-    
     // If it reaches the end, that means that there is no path between
     // the actors
     return nullptr;
@@ -218,7 +220,6 @@ void ActorGraph::printPath(ActorNode* path, ofstream& out)
             << print.second->getName() << ")";
 
     }
-    
     out << "\n";
 }
 
@@ -229,17 +230,15 @@ void ActorGraph::printPath(ActorNode* path, ofstream& out)
  */
 int ActorGraph::AC_BFS(string actor1, string actor2)
 {
+    //Checks to see if paths between two actors are possible
     if(actors.find(actor1) == actors.end() ||
        actors.find(actor2) == actors.end()){
         return 9999;
     }
-
-    //ActorNode* start = actors[actorFrom];
-    //ActorNode* end = actors[actorTo];   
-
     if(movies.empty()){ return 9999; }
 
     reset();
+
     for(auto it = actors.begin(); it != actors.end(); it++)
     {
         (*it).second->movie_history.clear();
@@ -247,11 +246,10 @@ int ActorGraph::AC_BFS(string actor1, string actor2)
 
     int min_year = std::numeric_limits<int>::max();
     int max_year = std::numeric_limits<int>::min();
-    //priority_queue<pair<Movie*, string>> sortedMovieYear;
+    
     priority_queue<Movie*, vector<Movie*>, MoviePtrComp> sortedMovieYear;
     for(auto it = movies.begin(); it!= movies.end(); it++)
     {
-        //cout << "in for loop" << endl;
         Movie* movie = (*it).second;
         int year = movie->getYear();
 
@@ -264,44 +262,29 @@ int ActorGraph::AC_BFS(string actor1, string actor2)
         {
             max_year = year;
         }
-       // cout << (*it).first << endl;
-        //sortedMovieYear.push(pair<Movie*, string>(movie, (*it).first));
         sortedMovieYear.push(movie);
-
-
     }
     
-    //cout << min_year << endl;
-    //cout << sortedMovieYear.top()->getMovie() << endl;
-
     for(int i = min_year; i <= max_year; i++)
     {
         while(!sortedMovieYear.empty())
-        {
-            
-            //Movie* movie = sortedMovieYear.top().first;
+        {            
             Movie* movie = sortedMovieYear.top();
-            //cout << movie-> getMovie() << endl;
-            //cout << movie->getYear()<< " v " << i  << endl;
             if(movie->getYear() != i) {break;} 
-            //string movie_title = sortedMovieYear.top().second;
+            
             string movie_title = movie->getMovie() + "#@" + to_string(i);
-            //cout << movie_title << endl;
             sortedMovieYear.pop();
-            //cout << movie->getMovie() << endl; 
+            
             auto it = movie->cast.begin();
             for( ; it != movie->cast.end(); it++)
             { 
                 ActorNode* actor = actors.at(*it);
                 actor->movie_history.insert(movie_title);
             }
-
         }
-        //cout << i << endl;
         if(BFSTraverse(actor1, actor2)){ return i;}
     }
     return 9999;
-
 }
 
 /** Does a BFS search to find the shortest path between two actors
@@ -316,7 +299,6 @@ bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) 
 
     bool have_header = false;
   
-//    cout << "before while"<< endl;
     //Keep reading lines until the end of file is reached
     while (infile) {
         string s;
@@ -352,7 +334,6 @@ bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) 
         string movie_title(record[1]);
         int movie_year = stoi(record[2]);
     
-  //      cout << "got strings"<< endl;
         //Checks to see if there is already an actor
         if(actors.find(actor_name) == actors.end())
         {
@@ -361,8 +342,6 @@ bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) 
                                      new ActorNode(actor_name)));
         }
         
-    //    cout << "actor" << endl; 
-    //    cout << actors.at(actor_name)->getName() << endl;
         //Checks to see if there is already a movie
         string movie_title_year = movie_title + "#@" + record[2];
         if(movies.find(movie_title_year) == movies.end())
@@ -370,14 +349,11 @@ bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) 
          
             movies.insert(pair<string, Movie*>(movie_title_year,
                                      new Movie(movie_title, movie_year)));
-        // ActorEdge* edge = new ActorEdge(movie, actor);
 	}
 
         Movie* movie = movies.at(movie_title_year);
         movie->cast.insert(actor_name);
 	
-	//Insert edge(that contain movie information) into actor->edge
-	//actor->edges.insert(edge);
 	if( use_weighted_edges)
         {
             ActorNode* actor = actors.at(actor_name);

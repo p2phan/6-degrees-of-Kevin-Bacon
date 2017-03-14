@@ -32,6 +32,10 @@ int Movie::getWeight()
     return 1 + (2015-year);
 }
 
+/*
+ * Less than comparison, so Movie will work in std::priority_queue
+ * Parameter: other - other movie being compared 
+ */
 bool Movie::operator<(const Movie& other)
 {
     if(getYear() != other.getYear())
@@ -39,8 +43,6 @@ bool Movie::operator<(const Movie& other)
         return other.getYear() < getYear(); 
 
     }
-
     return true;
-
 }
 

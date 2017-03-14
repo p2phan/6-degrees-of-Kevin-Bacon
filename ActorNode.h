@@ -1,14 +1,12 @@
 #ifndef ACTORNODE_H
 #define ACTORNODE_H
 
-//#include "ActorEdge.h"
 #include <unordered_set>
 #include <limits>
 
 /* CSE 100 PA 4 */
 /* Authors: Peter Phan
  *          Dephanie Ho */
-//class ActorEdge;
 
 using namespace std;
 
@@ -44,6 +42,7 @@ public:
     
     /*
      *  Less-than comparison, so ActorNodes will work in std::priority_queue
+     *  Parameter - other - other Actornode being compared
      */
     bool operator<(const ActorNode& other);     
 };

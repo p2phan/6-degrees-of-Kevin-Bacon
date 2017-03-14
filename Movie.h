@@ -10,7 +10,6 @@
  *          Dephanie Ho */
 
 class ActorNode;
-//class ActorEdge;
 
 using namespace std;
 
@@ -43,7 +42,7 @@ public:
     int getWeight();
 
     /** Less than comparison, so Movie will work in std::priority_queue
-     *
+     *  Parameter: other - other movie being compared
      */ 
     bool operator<(const Movie& other);
 
