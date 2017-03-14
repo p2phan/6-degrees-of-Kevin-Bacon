@@ -206,18 +206,24 @@ int UnionFind::connectActors(string actor1, string actor2)
             if(movie->getYear() != i) {break;}
             string movie_title = movie->getMovie() + "#@" + to_string(i);
             sortedMovieYear.pop();
-            auto it = movie->cast.begin();
-            for( ; it != movie->cast.end(); it++)
-            {
-                ActorNode* actor = actors.at(*it);
-                actor->movie_history.insert(movie_title);
-            }   
-        }
 
+
+            auto it = movie->cast.begin();
+            ActorNode* before = actors.at(*it);
+            while(++it != movie->cast.end())
+            {
+                ActorNode* curr = actors.at(*it);
+                UF_union(before->getName(), curr->getName());   
+                before = curr;
+            }   
+
+        }
+        //cout << UF_find(actor1)->getName() << " " << UF_find(actor2)->getName() << endl;
         if(UF_find(actor1) == UF_find(actor2)) { return i;}
 
     }
 
+    cout << "here" << endl;
     return 9999;
 
 /*
