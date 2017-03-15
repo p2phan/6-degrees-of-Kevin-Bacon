@@ -13,6 +13,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <limits>
 #include <queue>
 #include <vector>
 #include <unordered_set>
@@ -28,7 +29,8 @@ private:
 
 public:
 
-    User(int id) : ID(id), dist(0), searched(0), hits(0){} 
+    User(int id) : ID(id), dist(std::numeric_limits<int>::max()), 
+                   searched(0), hits(0){} 
 
     int hits; //used to store number of hits
     int dist; //will be used in a BFS search
@@ -37,8 +39,8 @@ public:
 
     /** Getter to return ID of user
      */ 
-    int getID();
-
+    int getID() const;
+ 
     /**
      * Less-than comparison, so User will work in std::priority_queue
      * Parameter - other - User being compared
@@ -70,11 +72,15 @@ private:
      */
      void deleteAll();
 
+    int min; //smallest id
+    int max; //largest id
+
 public:
     /**
      *  Constructor
      */ 
-    FriendGraph(void);
+    FriendGraph(void) : min(std::numeric_limits<int>::max()),
+                        max(std::numeric_limits<int>::min()) {}
 
     /**
      *  Destructor
@@ -113,7 +119,7 @@ public:
     void SuggestFriends(const char * outfilename);
 };
 
-int User::getID()
+int User::getID() const
 {
     return ID;
 }
@@ -121,8 +127,15 @@ int User::getID()
 
 bool User::operator<(const User& other)
 {
-    return hits < other.hits;
+    if(hits != other.hits)
+    {
+        cout << getID() << " vs " <<other.getID() << endl;
+        return hits < other.hits;
+    }
+
+    return other.getID() < getID();
 }
+
 
 /**
  *  Load the graph from a tab-delimited file of user->friend relationships
@@ -133,11 +146,16 @@ bool User::operator<(const User& other)
  */ 
 bool FriendGraph::loadFromFile(const char* infilename)
 {
+    cout << networks.size();
+    cout << "in" << endl;
     ifstream infile(infilename);
     
     while(infile)
     {
         string s;
+
+        if(!getline( infile, s)) break;
+
         istringstream ss( s );
    
         vector<string> record;
@@ -145,7 +163,7 @@ bool FriendGraph::loadFromFile(const char* infilename)
         while(ss) 
         {
             string next;
-            if(!getline(ss, next, '\t')) break;
+            if(!getline(ss, next, ' ')) break;
 
             record.push_back(next);  
         }
@@ -157,6 +175,13 @@ bool FriendGraph::loadFromFile(const char* infilename)
         //Retrieve users 
         int id1 = stoi(record[0]);
         int id2 = stoi(record[1]);
+
+        if(id1 < min) min = id1;
+        if(id2 < min) min = id2;
+   
+        if(max < id1) max = id1;
+        if(max < id2) max = id2;
+
 
         if(networks.find(id1) == networks.end())
         {
@@ -182,12 +207,22 @@ bool FriendGraph::loadFromFile(const char* infilename)
         } 
     } 
 
+    if (!infile.eof()) {
+        cerr << "Failed to read " << infilename << "!\n";
+        return false;
+    }
+    infile.close();
+
+    return true;
+
 }
 
 void FriendGraph::BFS(priority_queue<User*, vector<User*>, UserPtrComp>* q, 
                       User* user)
 
 {
+
+    user->dist = 0;
     queue<User*> toExplore;
     toExplore.push(user);
     
@@ -202,9 +237,11 @@ void FriendGraph::BFS(priority_queue<User*, vector<User*>, UserPtrComp>* q,
         for( ; it != curr->friends.end(); it++)
         {
             User* neighbor = networks[(*it)];
+            //cout << curr->getID() << " neighbors " << neighbor->getID() <<endl;
             neighbor->hits++;         
     
-            if(neighbor->searched){ continue; }
+//            cout << neighbor->hits << " " <<neighbor->getID() << endl;
+            if(neighbor->searched || neighbor == curr){ continue; }
 
             if(curr->dist+1 < neighbor->dist)
             {
@@ -214,6 +251,7 @@ void FriendGraph::BFS(priority_queue<User*, vector<User*>, UserPtrComp>* q,
 
                 if(neighbor->dist == 2)
                 {
+
                     q->push(neighbor);
                 }
             }
@@ -244,23 +282,20 @@ void FriendGraph::printSuggestions(int id, vector<User*>* suggest,
 void FriendGraph::SuggestFriends(const char * outfilename)
 {
 
+    cout <<networks.size()-1<< endl;
     int numSuggestions; //number of suggestions to print
     int id; // the ID to search for 
-    while(1)
-    {
-        cout << "Please enter an ID from 0-" << networks.size()-1 
+    do {
+        cout << "Please enter an ID from " << min << "-"  << max
              << " to find suggestions. -1 to quit" << endl;
         
         cin >> id;
 
         if(id == -1){ return; }
 
-        else if( 0 <= id && id < networks.size()){ break;} 
+    } while(id <= min && max < id);
 
-    }
-
-    while(1)
-    {
+    do {
         cout << "Please enter the number of suggestions you would like "
              << "between 1 and 50 inclusive. -1 to quit" << endl
              << "We will try to get as many suggestions as possible :)"
@@ -268,10 +303,15 @@ void FriendGraph::SuggestFriends(const char * outfilename)
 
         cin >> numSuggestions;
 
-        if(id == -1){ return;}
+        if(numSuggestions== -1){ return;}
 
-        else if( 0 < id && id <= 50){ break;}
 
+    } while(id <= 0 && 50 < id);
+
+    if(networks.find(id) == networks.end())
+    {
+        cout << "User " << id << " does not exist" << endl;
+        return;
     }
 
     User* user = networks[id];
@@ -288,7 +328,8 @@ void FriendGraph::SuggestFriends(const char * outfilename)
         q.pop();
  
         suggest.push_back(curr);
-           
+     
+        //cout << curr->getID() << " " << curr->hits <<endl;     
         counter++;
 
 /*        if(numSuggestions <= suggest.size())

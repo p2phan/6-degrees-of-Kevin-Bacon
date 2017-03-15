@@ -7,6 +7,9 @@
  *          based on their social connections 
  *
  */
+#include <iostream>
+
+#include "FriendGraph.hpp"
 
 using namespace std;
 
@@ -23,6 +26,14 @@ int main(int argc, char** argv)
         return -1;
     }
 
+    //Find suggested friends through BFS search 
+    FriendGraph graph;
+    
+    graph.loadFromFile(argv[1]);
+    graph.SuggestFriends(argv[2]);
+
+    return 0;
+    
     
 }
 
