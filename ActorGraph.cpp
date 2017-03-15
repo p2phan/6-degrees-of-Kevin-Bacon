@@ -334,6 +334,7 @@ void ActorGraph::AC_BFS(const char* in_filename, const char* out_filename)
     loadPairsFromFile(pairs, in_filename);
     vector<int> years(pairs.size(), 9999);
 
+    int counter = 0;
    
     for(int i = min_year; i <= max_year; i++)
     {
@@ -359,8 +360,11 @@ void ActorGraph::AC_BFS(const char* in_filename, const char* out_filename)
                BFSTraverse(pairs[j].first, pairs[j].second))
             {
                 years[j] = i;
+                counter++;
             }
         }
+        
+        if(counter == pairs.size()){ break; }
 
         printConnections(pairs, years, out_filename);
     }

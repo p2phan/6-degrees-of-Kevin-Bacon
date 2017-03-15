@@ -290,7 +290,8 @@ void UnionFind::connectActors(const char* in_filename, const char* out_filename)
     loadPairsFromFile(pairs, in_filename);
     vector<int> years(pairs.size(), 9999);
 
-    
+    int counter = 0;    
+
     for(int i = min_year; i <= max_year; i++)
     {
 
@@ -319,9 +320,12 @@ void UnionFind::connectActors(const char* in_filename, const char* out_filename)
                UF_find(pairs[j].first) == UF_find(pairs[j].second))
             {
                 years[j] = i;
+                counter++;
             }
         }
+        if(counter == pairs.size()){ break; }
     }
+
     printConnections(pairs, years, out_filename);
 }
 
