@@ -154,8 +154,10 @@ bool User::operator<(const User& other)
  */ 
 bool FriendGraph::loadFromFile(const char* infilename)
 {
+    //Initialize the file stream
     ifstream infile(infilename);
     
+    //Keep reading lines until the end of file is reached
     while(infile)
     {
         string s;
@@ -165,16 +167,20 @@ bool FriendGraph::loadFromFile(const char* infilename)
         istringstream ss( s );
    
         vector<string> record;
-
+        //get actors that are delimited by space
         while(ss) 
         {
             string next;
+         
+            //Get the next string before hitting a space
+            //and put it in 'next'
             if(!getline(ss, next, ' ')) break;
 
             record.push_back(next);  
         }
         if(record.size() != 2)
         {
+            //we should have exactly 2 columns
             continue;
         }
 
@@ -231,18 +237,21 @@ bool FriendGraph::loadFromFile(const char* infilename)
 void FriendGraph::BFS(priority_queue<User*, vector<User*>, UserPtrComp>* q, 
                       User* user)
 {
+    //Makes queue to store path
     user->dist = 0;
     queue<User*> toExplore;
     toExplore.push(user);
    
-    //Traverse through queue 
+    //BFS runs until queue is empty
     while(!toExplore.empty())
     {
+        //pops to explore
         User* curr = toExplore.front();
         toExplore.pop();
         
         if(curr->dist == 2) break;
         
+        //Checks through all the neighbors of current user
         auto it = curr->friends.begin();
         for( ; it != curr->friends.end(); it++)
         {
@@ -349,6 +358,7 @@ void FriendGraph::SuggestFriends(const char * outfilename)
      
         counter++;
     }
+    //print the suggested list of friends to the outfile
     printSuggestions(id, &suggest, outfilename);
 }
 

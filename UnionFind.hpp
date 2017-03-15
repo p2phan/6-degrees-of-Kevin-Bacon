@@ -250,13 +250,18 @@ ActorNode* UnionFind::UF_find(string actor)
  */
 void UnionFind::connectActors(const char* in_filename, const char* out_filename)
 {
+    //Initialize to opposite extremes to update correctly
     int min_year = std::numeric_limits<int>::max();
     int max_year = std::numeric_limits<int>::min();
+  
+    //priority queue to store the Movies so that the lowest movie is first
     priority_queue<Movie*, vector<Movie*>, MoviePtrComp> sortedMovieYear;
     for(auto it = movies.begin(); it!= movies.end(); it++)
     {
         Movie* movie = (*it).second;
         int year = movie->getYear();
+  
+        //updates to lowest and highest movie years
         if(year < min_year )
         {
             min_year = year;
@@ -266,27 +271,33 @@ void UnionFind::connectActors(const char* in_filename, const char* out_filename)
         {
             max_year = year;
         }
-        
+        //puts movie into the priority queue
         sortedMovieYear.push(movie);
     }
 
+    //pairs vector correspond to years vector
     vector<pair<string, string>> pairs;
     loadPairsFromFile(pairs, in_filename);
     vector<int> years(pairs.size(), 9999);
 
     int counter = 0;    
 
+    //Goes through each year and looks at the movie corresponding to each year
     for(int i = min_year; i <= max_year; i++)
     {
-
+        //makes sure priority queue is not empty
         while(!sortedMovieYear.empty())
         {
             Movie* movie = sortedMovieYear.top();
+            //Since the movies are sorted by year, if the top movie's year
+            //is different, we move the next year
             if(movie->getYear() != i) {break;}
             string movie_title = movie->getMovie() + "#@" + to_string(i);
             sortedMovieYear.pop();
 
-
+            //Looks through each movie's actors to add "edges"
+            //which is really just the list of movies that actor
+            //has been in
             auto it = movie->cast.begin();
             ActorNode* before = actors.at(*it);
             while(++it != movie->cast.end())
@@ -297,7 +308,8 @@ void UnionFind::connectActors(const char* in_filename, const char* out_filename)
             }   
 
         }
-        //turn into for loop
+        //After each year, we will see if the actors are linked
+        //if they are, we update the year and compress the path
         for(int j = 0; j < pairs.size(); j++)
         {
             if(years[j] == 9999 &&
@@ -309,7 +321,7 @@ void UnionFind::connectActors(const char* in_filename, const char* out_filename)
         }
         if(counter == pairs.size()){ break; }
     }
-
+    //in the end, we print out the connections
     printConnections(pairs, years, out_filename);
 }
 
