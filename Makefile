@@ -32,5 +32,5 @@ ActorGraph.o: ActorNode.h Movie.h ActorGraph.h UnionFind.hpp
 
 
 clean:
-	rm -f pathfinder actorconnections *.o core*
+	rm -f pathfinder actorconnections extension *.o core*
 
