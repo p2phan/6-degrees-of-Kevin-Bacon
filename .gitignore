@@ -31,3 +31,6 @@ SocialNetworks/*
 tsv/*
 
 .nfs*
+*.txt
+
+!pa4/SocialNetworks/data/small_test_graph.txt
