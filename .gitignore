@@ -26,6 +26,7 @@
 *.tsv
 
 # PA4 files
+!pa4/SocialNetworks/data/small_test_graph.txt
 pa4/*
 SocialNetworks/*
 tsv/*
@@ -33,4 +34,3 @@ tsv/*
 .nfs*
 *.txt
 
-!pa4/SocialNetworks/data/small_test_graph.txt
