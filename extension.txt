@@ -1,0 +1,31 @@
+Peter Phan A13042904 cs100wdh
+Dephanie Ho A12705618 cs100wam
+
+In extension.cpp, we wanted to give a user a list of suggested 
+friends based on the user's friends.  The more mutual friends 
+the suggested friend has with the user's friends, the higher 
+the hits the suggested friend has, and the suggested friends are 
+returned in order of highest hits.  We displayed this network by 
+building a graph that takes in users as the nodes, and the friendship
+between the users as the edges.  We solved the problem by using BFS 
+to search through mutual friends of friends that are at least a 
+distance of 2 away from the user.  
+The suggested friends are stored and the number of suggested friends 
+are returned based on the number of suggestions given to the program.
+
+We tested our program by drawing a small graph from the small connection
+file , and verifying with what was printed out
+
+The grader should run the program with the given arguments 
+./extension <Friend dataset file> <Output file>.  
+The grader is then prompted to enter a user id to recommend suggested 
+friends for that user, and then prompted to enter the number of 
+suggestions to return.  The program will return as many suggestions
+as possible if the number of suggestions is greater than the 
+actual possible number of suggested friends.
+The data set is in the Social Networks folder given to us. 
+From the pa4 folder the pathway is pa4/SocialNetworks/data 
+where the user can either choose facebook_1000.txt or facebook_2000.txt.
+	
+One problem we have is with the priority queue 
+which is not making the the proper operator overload comparison
