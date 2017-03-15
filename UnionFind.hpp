@@ -2,8 +2,8 @@
 #define UNIONFIND_HPP
 
 /** Filename: UnionFind.hpp
- *  Author: Peter Phan  
- *          Dephanie Ho
+ *  Author: Peter Phan A13042904 cs100wdh
+ *          Dephanie Ho A12705618 cs100wam
  *  Date:   03/10/17
  *
  *  Implements a disjoint set that allows us to keep track
@@ -72,11 +72,7 @@ public:
      */
     ActorNode* UF_find(string actor);
 
-    /**
-     *  Resets the unions
-     */  
-    void reset();
-    
+   
     /**
      * Returns the year after which two actors become connected
      * through a disjoint implementation
@@ -246,18 +242,6 @@ ActorNode* UnionFind::UF_find(string actor)
 }
 
 /**
- * Resets the unions
- */
-void UnionFind::reset()
-{
-    for(auto it = actors.begin(); it != actors.end(); it++)
-    {
-        ActorNode* actor = (*it).second;
-        actor->v.prevA = actor;
-    }
-}
-
-/**
  * Returns the year after which two actors become connected
  * through a disjoint implementation
  *
@@ -336,18 +320,21 @@ void UnionFind::connectActors(const char* in_filename, const char* out_filename)
  */
 bool UnionFind::loadFromFile(const char* in_filename)
 {
-   ifstream infile(in_filename);
+
+    //Initialize the file stream
+    ifstream infile(in_filename);
 
     bool have_header = false;
 
-
+    //Keep reading lines until the end of file is reached
     while (infile) {
         string s;
 
+        //Get the next line
         if (!getline( infile, s )) break;
 
         if (!have_header) {
-
+            //Skip the header
             have_header = true;
             continue;
         }
@@ -358,13 +345,15 @@ bool UnionFind::loadFromFile(const char* in_filename)
         while (ss) {
             string next;
 
+            //Get the next string before hitting a tab character 
+            //and put it in 'next'
             if (!getline( ss, next, '\t' )) break;
 
             record.push_back( next );
         }
 
         if (record.size() != 3) {
-
+            //We should have exactly 3 columns
             continue;
         }
 
@@ -372,8 +361,10 @@ bool UnionFind::loadFromFile(const char* in_filename)
         string movie_title(record[1]);
         int movie_year = stoi(record[2]);
 
+        //Checks to see if there is already an actor
         if(actors.find(actor_name) == actors.end())
         {
+            //if not insert into the graph
             actors.insert(pair<string, ActorNode*>(actor_name,
                                      new ActorNode(actor_name)));
         }
@@ -381,6 +372,7 @@ bool UnionFind::loadFromFile(const char* in_filename)
         ActorNode* actor = actors.at(actor_name);
         actor->v.prevA = actor;
 
+        //Checks to see if there is already a movie
         string movie_title_year = movie_title + "#@" + record[2];
         if(movies.find(movie_title_year) == movies.end())
         {
@@ -390,6 +382,7 @@ bool UnionFind::loadFromFile(const char* in_filename)
 
         }
 
+        // updates Movie information
         Movie* movie = movies.at(movie_title_year);
         movie->cast.insert(actor_name);
     }
@@ -408,6 +401,7 @@ bool UnionFind::loadFromFile(const char* in_filename)
  */
 void UnionFind::deleteAll()
 {
+    // goes through each movie and actor to delete
     for(auto it = movies.begin(); it != movies.end(); it++){
         delete (*it).second;
     }

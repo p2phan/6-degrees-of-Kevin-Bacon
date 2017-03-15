@@ -1,7 +1,7 @@
 /**
  * ActorGraph.h
- * Author: Peter Phan, 
- *         Dephanie Ho
+ * Author: Peter Phan A13042904 cs100wdh, 
+ *         Dephanie Ho A12705618 cs100wam
  * Date:   02/28/2017
  *
  * This file is meant to exist as a container for starter code that you can use to read the input file format

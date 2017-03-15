@@ -1,7 +1,7 @@
 /**
  * Filename: extension.cpp
- * Authors: Peter Phan
- *          Dephanie Ho
+ * Authors: Peter Phan A13042904 cs100wdh
+ *          Dephanie Ho A12705618 cs100wam
  *
  * Purpose: Given a Facebook friend data set, recommend someone to add
  *          based on their social connections 
@@ -33,8 +33,6 @@ int main(int argc, char** argv)
     graph.SuggestFriends(argv[2]);
 
     return 0;
-    
-    
 }
 
 

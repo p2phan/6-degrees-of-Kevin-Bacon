@@ -1,7 +1,7 @@
 /**
  * ActorNode.cpp
- * Author: Peter Phan
- *         Dephanie Ho
+ * Author: Peter Phan A13042904 cs100wdh
+ *         Dephanie Ho A12705618 cs100wam
  *
  * Date:   2/28/2017
  * 

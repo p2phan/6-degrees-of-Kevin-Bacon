@@ -1,7 +1,7 @@
 /*
  * Actorconnections.cpp
- * Author: Peter Phan
- *         Dephanie Ho
+ * Author: Peter Phan A13042904 cs100wdh
+ *         Dephanie Ho A12705618 cs100wam
  * Date: 03/09/2017
  *
  * This class determines after which year did two actors became connected.

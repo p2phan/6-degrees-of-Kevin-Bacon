@@ -5,8 +5,8 @@
 #include <limits>
 
 /* CSE 100 PA 4 */
-/* Authors: Peter Phan
- *          Dephanie Ho */
+/* Authors: Peter Phan A13042904 cs100wdh
+ *          Dephanie Ho A12705618 cs100wam*/
 
 using namespace std;
 

@@ -1,7 +1,7 @@
 /*
  * ActorGraph.cpp
- * Author: Peter Phan
- *         Dephanie Ho
+ * Author: Peter Phan A13042904 cs100wdh
+ *         Dephanie Ho A12705618 cs100wam
  * Date:   02/28/2017
  *
  * Class that is representative of a graph where actors are nodes,
@@ -120,7 +120,7 @@ ActorNode* ActorGraph::DijkstraTraverse(string actorFrom, string actorTo)
             }   
         }         
     }
-    //If end node is never searched, there is no possible path between the actors
+    //If end node is never searched, there is no possible path 
     if(!end->v.searched)
     {
         return 0;
@@ -143,6 +143,7 @@ ActorNode* ActorGraph::BFSTraverse(string actorFrom, string actorTo)
         return 0;
     }
     
+    //gets the start and end nodes
     ActorNode* start = actors[actorFrom];
     ActorNode* end = actors[actorTo];
     
@@ -157,6 +158,7 @@ ActorNode* ActorGraph::BFSTraverse(string actorFrom, string actorTo)
     //BFS runs until queue is empty
     while(!toExplore.empty())
     {
+        //pops to explore
         ActorNode* next = toExplore.front();
         toExplore.pop();
      
@@ -238,10 +240,12 @@ void ActorGraph::printPath(ActorNode* path, ofstream& out)
 bool ActorGraph::loadPairsFromFile(vector<pair<string, string>> &pairs,
                            const char* in_filename)
 {
+    //Initialize the file stream
     ifstream infile(in_filename);
 
     bool have_header = false;
 
+    //Keep reading lines until the end of file is reached
     while(infile)
         {
             string s;
@@ -259,17 +263,20 @@ bool ActorGraph::loadPairsFromFile(vector<pair<string, string>> &pairs,
             while(ss) {
                 string next;
 
+                //Get the next string before hitting a tab character 
+                //and put it in 'next'
                 if(!getline( ss, next, '\t' )) break;
 
                 record.push_back( next );
             }
             if(record.size() != 2) {
+                // we should have exactly 2 columns
                 continue;
             }
             //Get pair of actors
             string actor1(record[0]);
             string actor2(record[1]);
-
+            //stores the pair of actors
             pairs.push_back(pair<string, string>(actor1, actor2));
         }
     if (!infile.eof()) {
@@ -290,7 +297,9 @@ bool ActorGraph::loadPairsFromFile(vector<pair<string, string>> &pairs,
 void ActorGraph::printConnections(vector<pair<string, string>> &pairs,
                           vector<int> &years, const char* out_filename)
 {
+    //Initilize the out file stream
     ofstream outfile(out_filename);
+    //Prints out header
     outfile << "Actor1\tActor2\tYear\n";
 
     for(int i = 0; i < pairs.size(); i++)
@@ -334,7 +343,7 @@ void ActorGraph::AC_BFS(const char* in_filename, const char* out_filename)
     loadPairsFromFile(pairs, in_filename);
     vector<int> years(pairs.size(), 9999);
 
-    int counter = 0;
+//    int counter = 0;
    
     for(int i = min_year; i <= max_year; i++)
     {
@@ -360,11 +369,11 @@ void ActorGraph::AC_BFS(const char* in_filename, const char* out_filename)
                BFSTraverse(pairs[j].first, pairs[j].second))
             {
                 years[j] = i;
-                counter++;
+   //             counter++;
             }
         }
         
-        if(counter == pairs.size()){ break; }
+ //       if(counter == pairs.size()){ break; }
 
         printConnections(pairs, years, out_filename);
     }
@@ -403,7 +412,8 @@ bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) 
         while (ss) {
             string next;
       
-            //Get the next string before hitting a tab character and put it in 'next'
+            //Get the next string before hitting a tab character 
+            //and put it in 'next'
             if (!getline( ss, next, '\t' )) break;
 
             record.push_back( next );
@@ -435,9 +445,11 @@ bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) 
                                      new Movie(movie_title, movie_year)));
 	}
 
+        // updates Movie information
         Movie* movie = movies.at(movie_title_year);
         movie->cast.insert(actor_name);
 	
+        //if we are using edges, then we will update actor info
 	if(use_weighted_edges)
         {
             ActorNode* actor = actors.at(actor_name);
@@ -459,6 +471,7 @@ bool ActorGraph::loadFromFile(const char* in_filename, bool use_weighted_edges) 
  */
 void ActorGraph::deleteAll()
 {
+    //goes through each movie and actor to delete
     for(auto it = movies.begin(); it != movies.end(); it++){
         delete (*it).second;
     }

@@ -1,7 +1,7 @@
 /**
  * FriendGraph.hpp 
- * Author: Peter Phan,
- *         Dephanie Ho
+ * Author: Peter Phan, A13042904 cs100wdh
+ *         Dephanie Ho A12705618 cs100wam
  *
  * Date: 03/14/2017
  *
@@ -105,7 +105,10 @@ public:
     void BFS(priority_queue<User*, vector<User*>, UserPtrComp>* q, User* user);
     
     /** Prints out the given suggestions
-     *
+     * 
+     *  Parameter: id - user to give suggestions to
+     *              v - list of suggested friends
+     *             outfilename - outfile to write to
      */
     void printSuggestions(int id, vector<User*>* v,
                           const char * outfilename);
@@ -119,23 +122,28 @@ public:
     void SuggestFriends(const char * outfilename);
 };
 
+
+/*
+ * Getter to return the user ID
+ */
 int User::getID() const
 {
     return ID;
 }
 
-
+/*
+ * Comparison class to return the from lowest ID number to highest 
+ * in the priority queue
+ */
 bool User::operator<(const User& other)
 {
     if(hits != other.hits)
     {
-        cout << getID() << " vs " <<other.getID() << endl;
         return hits < other.hits;
     }
 
     return other.getID() < getID();
 }
-
 
 /**
  *  Load the graph from a tab-delimited file of user->friend relationships
@@ -146,8 +154,6 @@ bool User::operator<(const User& other)
  */ 
 bool FriendGraph::loadFromFile(const char* infilename)
 {
-    cout << networks.size();
-    cout << "in" << endl;
     ifstream infile(infilename);
     
     while(infile)
@@ -182,7 +188,7 @@ bool FriendGraph::loadFromFile(const char* infilename)
         if(max < id1) max = id1;
         if(max < id2) max = id2;
 
-
+        //If network does not already have the id, add user
         if(networks.find(id1) == networks.end())
         {
             networks.insert(pair<int, User*>(id1, new User(id1) ));
@@ -193,6 +199,7 @@ bool FriendGraph::loadFromFile(const char* infilename)
             networks.insert(pair<int, User*>(id2, new User(id2) ));
         }
 
+        //Connect the users and their corresponding friendships
         User* user1 = networks[id1];
         User* user2 = networks[id2];
 
@@ -214,18 +221,21 @@ bool FriendGraph::loadFromFile(const char* infilename)
     infile.close();
 
     return true;
-
 }
 
+/** Does a BFS search to find suggestions
+ *  
+ *  Parameter: user - the user from which to start the BFS
+ *  suggestions - the queue to store suggestion               
+ */
 void FriendGraph::BFS(priority_queue<User*, vector<User*>, UserPtrComp>* q, 
                       User* user)
-
 {
-
     user->dist = 0;
     queue<User*> toExplore;
     toExplore.push(user);
-    
+   
+    //Traverse through queue 
     while(!toExplore.empty())
     {
         User* curr = toExplore.front();
@@ -237,10 +247,8 @@ void FriendGraph::BFS(priority_queue<User*, vector<User*>, UserPtrComp>* q,
         for( ; it != curr->friends.end(); it++)
         {
             User* neighbor = networks[(*it)];
-            //cout << curr->getID() << " neighbors " << neighbor->getID() <<endl;
             neighbor->hits++;         
     
-//            cout << neighbor->hits << " " <<neighbor->getID() << endl;
             if(neighbor->searched || neighbor == curr){ continue; }
 
             if(curr->dist+1 < neighbor->dist)
@@ -248,21 +256,24 @@ void FriendGraph::BFS(priority_queue<User*, vector<User*>, UserPtrComp>* q,
                 neighbor->searched = true;
                 neighbor->dist = curr->dist+1;
                 toExplore.push(neighbor);
-
+         
+                //Store the neighbor if the suggested friend dist is within 2      
                 if(neighbor->dist == 2)
                 {
-
                     q->push(neighbor);
                 }
             }
-
-
         }
     }
-
 }
 
-
+/**
+ * Print suggested friend list
+ *
+ * Parameter: id - user to give suggestions to
+ *            suggest - vector that holds list of suggested friends
+ *            outfilename - outfile to write info to
+ */
 void FriendGraph::printSuggestions(int id, vector<User*>* suggest,
                                    const char* outfilename)
 {
@@ -275,16 +286,21 @@ void FriendGraph::printSuggestions(int id, vector<User*>* suggest,
         User* user = suggest->at(i);
         outfile << user->getID() << " have " << user->hits 
                 << " mutuals" << endl;
-
     }
 }
 
+/**
+ * Returns a list of suggested friends
+ *
+ *  Parameter: user - user to search friend network from
+ *  numSuggestions - number of friends suggested to return
+ */
 void FriendGraph::SuggestFriends(const char * outfilename)
 {
-
-    cout <<networks.size()-1<< endl;
     int numSuggestions; //number of suggestions to print
     int id; // the ID to search for 
+    
+    //Prompt the program to give a user
     do {
         cout << "Please enter an ID from " << min << "-"  << max
              << " to find suggestions. -1 to quit" << endl;
@@ -295,6 +311,7 @@ void FriendGraph::SuggestFriends(const char * outfilename)
 
     } while(id <= min && max < id);
 
+    //Prompt the program to give the number of suggestions
     do {
         cout << "Please enter the number of suggestions you would like "
              << "between 1 and 50 inclusive. -1 to quit" << endl
@@ -321,6 +338,7 @@ void FriendGraph::SuggestFriends(const char * outfilename)
     
     BFS(&q, user);
     
+    //Put suggested users in priority queue to pop out the most hits user
     int counter = 0;
     while(!q.empty() && counter < numSuggestions)
     {
@@ -329,31 +347,14 @@ void FriendGraph::SuggestFriends(const char * outfilename)
  
         suggest.push_back(curr);
      
-        //cout << curr->getID() << " " << curr->hits <<endl;     
         counter++;
-
-/*        if(numSuggestions <= suggest.size())
-        {
-            auto it = suggest.begin();
-            if((*it).first < curr->hits)
-            {
-                suggest.erase(it);
-                suggest.insert(curr);
-            }       
-        }
-        else
-        {
-            suggest.insert(user);
-        }
-*/
-
     }
-    
     printSuggestions(id, &suggest, outfilename);
-
 }
 
-
+/**
+ * Helper method for destructor
+ */
 void FriendGraph::deleteAll()
 {
     for(auto it = networks.begin(); it != networks.end(); it++)
@@ -362,10 +363,7 @@ void FriendGraph::deleteAll()
     }
 }
 
-
 /* Destructor */
 FriendGraph::~FriendGraph(){deleteAll();}
-
-
 
 #endif //FRIENDGRAPH_HPP
