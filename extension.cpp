@@ -29,6 +29,7 @@ int main(int argc, char** argv)
     //Find suggested friends through BFS search 
     FriendGraph graph;
     
+    //Makes Graph and Prompts user to find suggestions for a user
     graph.loadFromFile(argv[1]);
     graph.SuggestFriends(argv[2]);
 

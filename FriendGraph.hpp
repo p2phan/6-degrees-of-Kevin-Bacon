@@ -20,7 +20,9 @@
 #include <unordered_map>
 
 using namespace std;
-
+/*
+ * class to implement nodes and contains ID of a user
+ */
 class User
 {
     
@@ -132,16 +134,19 @@ int User::getID() const
 }
 
 /*
- * Comparison class to return the from lowest ID number to highest 
+ * Comparison class to return the from highest hits to lowest 
  * in the priority queue
+ * Parameter: other - user node to compare to
  */
 bool User::operator<(const User& other)
 {
+    //Bigger hit is higher prioirty
     if(hits != other.hits)
     {
         return hits < other.hits;
     }
-
+    //if number of hits are the same then lower ID 
+    //get priority
     return other.getID() < getID();
 }
 
@@ -188,6 +193,7 @@ bool FriendGraph::loadFromFile(const char* infilename)
         int id1 = stoi(record[0]);
         int id2 = stoi(record[1]);
 
+        //updates lowest and highest user id
         if(id1 < min) min = id1;
         if(id2 < min) min = id2;
    
@@ -286,10 +292,12 @@ void FriendGraph::BFS(priority_queue<User*, vector<User*>, UserPtrComp>* q,
 void FriendGraph::printSuggestions(int id, vector<User*>* suggest,
                                    const char* outfilename)
 {
+    //initializes out file stream
     ofstream outfile(outfilename);
     outfile << "For user " << id  << ", we suggest the following friends " 
             << "in order of number of mutual friends:" << endl;
 
+    //prints out sugestions in order of most common mutuals
     for(int i = 0; i < suggest->size(); i++)
     {
         User* user = suggest->at(i);
@@ -340,10 +348,11 @@ void FriendGraph::SuggestFriends(const char * outfilename)
         return;
     }
 
+    //initilizes data structures
     User* user = networks[id];
 
     priority_queue<User*, vector<User*>, UserPtrComp> q;
-    vector<User*> suggest;  
+    vector<User*> suggest; //uses to print out suggestions  
     
     BFS(&q, user);
     

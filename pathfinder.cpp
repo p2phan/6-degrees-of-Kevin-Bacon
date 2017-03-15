@@ -22,18 +22,22 @@ int main(int argc, char** argv){
         return -1;
     }
     
+    //constructing graph
     ActorGraph graph;
     graph.loadFromFile(argv[1], true);
 
     ifstream infile;
     infile.open(argv[3]);
 
+    //file check
     if(!infile.is_open())
     {
         cout << "Third file cannot be opened" << endl;
         return -1;
     }
 
+    //the search will depend on whether the graph is weighted
+    //or not
     bool weighted;
     if(string(argv[2]) == "u")
     {
@@ -56,6 +60,7 @@ int main(int argc, char** argv){
 
     bool have_header = false;
 
+    //Read lines until end of file is reach
     while (infile)
     {
         string s;
@@ -113,6 +118,7 @@ int main(int argc, char** argv){
         }
     }
 
+    //closes stream
     infile.close();
     outfile.close();   
 }

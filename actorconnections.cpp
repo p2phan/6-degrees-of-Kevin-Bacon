@@ -17,7 +17,7 @@
 using namespace  std;
 
 int main(int argc, char** argv) {
-    string algorithm;
+    string algorithm;// stores which algorithm will be used
 
     //Argument check
     if(argc == 4)
